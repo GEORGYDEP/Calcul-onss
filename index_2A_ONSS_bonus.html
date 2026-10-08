@@ -1,0 +1,1598 @@
+<!DOCTYPE html>
+<html lang="fr-BE">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Les rémunérations — Partie 2A : ONSS et bonus à l'emploi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0a0e14; --bg2:#0f151f; --bg3:#16202d; --card:#121b27;
+  --accent:#3ae08c; --accent2:#1fa968; --orange:#ff9f43; --gold:#ffd166; --blue:#4aa8ff; --violet:#a78bfa;
+  --text:#e9eff7; --text2:#9fb0c5; --text3:#6f8299;
+  --border:#22303f; --radius:14px;
+  --success:#3ae08c; --error:#ff5f6d; --warn:#ffc94d;
+  --paper:#fdfdf9; --ink:#1d2733;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{min-height:100%}
+body{
+  font-family:'Outfit',system-ui,sans-serif;background:var(--bg);color:var(--text);
+  background-image:radial-gradient(1100px 520px at 12% -8%,rgba(58,224,140,.10),transparent 60%),
+                   radial-gradient(900px 460px at 96% 4%,rgba(255,159,67,.09),transparent 60%);
+  background-attachment:fixed;line-height:1.55;-webkit-text-size-adjust:100%;
+}
+.mono{font-family:'Space Mono',monospace}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+input,select{font-family:inherit}
+.hidden{display:none !important}
+:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+b,strong{font-weight:700}
+
+/* ---------- HUD ---------- */
+.topbar{position:sticky;top:0;z-index:60;background:rgba(10,14,20,.93);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
+.topbar-in{max-width:1120px;margin:0 auto;padding:9px 16px 6px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.brand{font-weight:800;font-size:1rem;display:flex;align-items:center;gap:8px}
+.brand .logo{font-size:1.25rem}
+.spacer{flex:1}
+.badge{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:999px;background:var(--bg3);border:1px solid var(--border);font-size:.8rem;font-weight:600;white-space:nowrap}
+.badge.acc{color:var(--accent);border-color:rgba(58,224,140,.35)}
+.badge.org{color:var(--orange);border-color:rgba(255,159,67,.35)}
+.badge.pulse{animation:pulse 1s ease-in-out infinite}
+button.badge:hover{border-color:var(--accent)}
+.hud2{max-width:1120px;margin:0 auto;padding:0 16px 9px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.xp-rank{font-size:.8rem;font-weight:700;white-space:nowrap}
+.xpbar{position:relative;flex:1;min-width:140px;height:9px;background:var(--bg3);border-radius:6px;overflow:visible;border:1px solid var(--border)}
+.xpfill{height:100%;border-radius:6px;background:linear-gradient(90deg,var(--accent),var(--gold));width:0;transition:width .6s ease}
+.xpmark{position:absolute;top:-3px;width:2px;height:13px;background:var(--text3);border-radius:1px}
+.xpmark.reached{background:var(--gold)}
+.xp-next{font-size:.74rem;color:var(--text3);white-space:nowrap}
+.navdots{display:flex;gap:6px}
+.navdot{width:27px;height:27px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:800;background:var(--bg3);border:1.5px solid var(--border);color:var(--text2)}
+.navdot.done{background:rgba(58,224,140,.15);border-color:var(--accent);color:var(--accent)}
+.navdot.cur{border-color:var(--gold);color:var(--gold)}
+.navdot.locked{opacity:.4;cursor:not-allowed}
+
+/* ---------- LAYOUT ---------- */
+.wrap{max-width:1000px;margin:0 auto;padding:18px 16px 60px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px}
+.card+.card{margin-top:14px}
+h1{font-size:1.8rem;font-weight:800;line-height:1.2}
+h2{font-size:1.25rem;font-weight:800}
+h3{font-size:1.02rem;font-weight:700}
+.muted{color:var(--text2)}
+.small{font-size:.86rem}
+.tiny{font-size:.78rem}
+.center{text-align:center}
+
+/* ---------- BUTTONS ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:11px 18px;border-radius:12px;font-weight:700;font-size:.92rem;background:var(--bg3);border:1px solid var(--border);color:var(--text);transition:transform .12s ease,background .18s ease,border-color .18s ease}
+.btn:hover{transform:translateY(-2px);border-color:var(--text3)}
+.btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#07130c;border:none}
+.btn-gold{background:linear-gradient(135deg,var(--gold),var(--orange));color:#2b1400;border:none}
+.btn-ghost{background:transparent}
+.btn-acc-outline{background:transparent;border:1.5px solid var(--accent);color:var(--accent)}
+.btn-acc-outline:hover{background:var(--accent);color:#07130c}
+.btn-org-outline{background:transparent;border:1.5px solid var(--orange);color:var(--orange)}
+.btn-org-outline:hover{background:var(--orange);color:#2b1400}
+.btn-sm{padding:7px 12px;font-size:.8rem;border-radius:9px}
+.btn-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.btn-row.end{justify-content:flex-end}
+
+/* ---------- WELCOME ---------- */
+.hero{text-align:center;padding:30px 20px}
+.hero .icon{font-size:3rem;line-height:1}
+.hero h1{margin:12px 0 6px;font-size:2.1rem}
+.hero .sub{color:var(--orange);font-weight:700;margin-bottom:12px}
+.hero p{color:var(--text2);max-width:640px;margin:0 auto}
+.counters{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;margin:22px auto 6px;max-width:720px}
+.counter{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:12px 8px}
+.counter .v{font-size:1.4rem;font-weight:800;font-family:'Space Mono',monospace}
+.counter .k{font-size:.74rem;color:var(--text3)}
+.who{margin-top:14px;font-size:.84rem;color:var(--text2)}
+.who b{color:var(--accent)}
+
+/* ---------- PATH (hub) ---------- */
+.path{position:relative;margin:18px 0 6px;padding:6px 0}
+.path:before{content:'';position:absolute;left:50%;top:0;bottom:0;border-left:3px dashed var(--border);transform:translateX(-50%)}
+.pnode-row{position:relative;display:flex;align-items:center;min-height:120px}
+.pnode-row .pcard{width:calc(50% - 46px)}
+.pnode-row.left{justify-content:flex-start}
+.pnode-row.right{justify-content:flex-end}
+.pnode{position:absolute;left:50%;transform:translateX(-50%);width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-family:'Space Mono',monospace;background:var(--bg3);border:3px solid var(--border);z-index:2;font-size:1rem}
+.pnode.done{background:rgba(58,224,140,.18);border-color:var(--accent);color:var(--accent)}
+.pnode.cur{border-color:var(--gold);color:var(--gold);box-shadow:0 0 0 0 rgba(255,209,102,.6);animation:ring 1.6s infinite}
+.pnode.locked{opacity:.55}
+@keyframes ring{0%{box-shadow:0 0 0 0 rgba(255,209,102,.55)}70%{box-shadow:0 0 0 14px rgba(255,209,102,0)}100%{box-shadow:0 0 0 0 rgba(255,209,102,0)}}
+.pcard{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;text-align:left;transition:.16s;display:block}
+button.pcard:hover{border-color:var(--gold);transform:translateY(-2px)}
+.pcard.locked{opacity:.55;cursor:not-allowed}
+.pcard .pi{font-size:1.5rem}
+.pcard .pt{font-weight:800;font-size:.98rem;margin:2px 0}
+.pcard .pd{font-size:.82rem;color:var(--text2)}
+.pcard .pm{margin-top:7px;font-size:.78rem;color:var(--text3);display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.stars{color:var(--gold);letter-spacing:2px}
+.trophies{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px;margin-top:12px}
+.trophy{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:11px;display:flex;gap:10px;align-items:flex-start}
+.trophy .ti{font-size:1.6rem;line-height:1}
+.trophy .tn{font-weight:700;font-size:.86rem}
+.trophy .tc{font-size:.74rem;color:var(--text3)}
+.trophy.off{opacity:.45;filter:grayscale(1)}
+.trophy.on{border-color:rgba(255,209,102,.5);background:rgba(255,209,102,.07)}
+
+/* ---------- BRIEF ---------- */
+.brief-h{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.brief-h .bi{font-size:2.2rem}
+.brief-h .bm{font-size:.8rem;color:var(--text3)}
+.goals{background:rgba(58,224,140,.07);border:1px solid rgba(58,224,140,.3);border-radius:12px;padding:12px 14px;margin:10px 0}
+.goals h3{font-size:.92rem;color:var(--accent);margin-bottom:5px}
+.goals li{margin:3px 0 3px 18px;font-size:.9rem}
+.theo{background:linear-gradient(135deg,rgba(74,168,255,.10),rgba(167,139,250,.07));border:1px solid rgba(74,168,255,.3);border-radius:12px;padding:12px 14px;margin:10px 0;font-size:.9rem;color:var(--text2)}
+.theo h3{color:var(--blue);font-size:.92rem;margin-bottom:5px}
+.theo b{color:var(--text)}
+.theo ul{margin:5px 0 5px 18px}
+.theo li{margin:3px 0}
+.theo p+p{margin-top:6px}
+.exbox{background:rgba(255,159,67,.08);border:1px solid rgba(255,159,67,.35);border-radius:12px;padding:12px 14px;margin:10px 0;font-size:.88rem;color:var(--text2)}
+.exbox h3{color:var(--orange);font-size:.92rem;margin-bottom:5px}
+.exbox b{color:var(--text)}
+details.plus{background:rgba(255,209,102,.07);border:1px solid rgba(255,209,102,.35);border-radius:12px;padding:10px 14px;margin:10px 0;font-size:.86rem;color:var(--text2)}
+details.plus summary{cursor:pointer;color:var(--gold);font-weight:700}
+details.plus p{margin-top:7px}
+.pred{margin:16px 0 6px;padding:14px;border-radius:12px;background:var(--bg3);border:1px solid var(--border)}
+.pred h3{font-size:.95rem;margin-bottom:9px}
+.pred .btn.on{border-color:var(--gold);color:var(--gold);background:rgba(255,209,102,.1)}
+table.mini{width:100%;border-collapse:collapse;font-size:.82rem;margin-top:8px}
+table.mini td,table.mini th{border-bottom:1px solid var(--border);padding:5px 7px;text-align:left}
+table.mini th{color:var(--text3);font-size:.7rem;text-transform:uppercase;letter-spacing:.6px}
+table.mini td.r,table.mini th.r{text-align:right;font-family:'Space Mono',monospace;white-space:nowrap}
+.scroll{overflow-x:auto}
+
+/* ---------- QUESTION ---------- */
+.qtop{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.qtop .qm{font-weight:700;font-size:.92rem}
+.qdots{display:flex;gap:6px;margin-left:auto}
+.qdot{width:14px;height:14px;border-radius:50%;background:var(--bg3);border:1.5px solid var(--border)}
+button.qdot{cursor:pointer}
+.qdot.correct{background:var(--accent);border-color:var(--accent)}
+.qdot.hint{background:var(--orange);border-color:var(--orange)}
+.qdot.shown{background:var(--error);border-color:var(--error)}
+.qdot.cur{background:var(--gold);border-color:var(--gold);box-shadow:0 0 8px var(--gold)}
+.qtag{font-size:.74rem;font-family:'Space Mono',monospace;color:var(--text3);margin-bottom:8px}
+.qtext{font-size:1.04rem;font-weight:600;margin-bottom:10px;line-height:1.5}
+.qtext b{color:var(--gold)}
+.data{display:block;background:var(--bg2);border:1px dashed var(--text3);border-radius:10px;padding:10px 13px;font-size:.88rem;color:var(--text2);margin:8px 0 12px;line-height:1.6}
+.data b{color:var(--text)}
+.shake{animation:shake .45s}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(7px)}60%{transform:translateX(-5px)}80%{transform:translateX(3px)}}
+.opts{display:grid;gap:9px;margin-top:6px}
+.opt{display:flex;gap:11px;align-items:flex-start;text-align:left;padding:12px 14px;border-radius:12px;background:var(--bg3);border:1.5px solid var(--border);font-size:.93rem;transition:.14s}
+.opt:hover:not(:disabled){border-color:var(--blue);transform:translateX(3px)}
+.opt .ol{flex:0 0 26px;height:26px;border-radius:7px;background:var(--bg2);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.8rem;font-family:'Space Mono',monospace}
+.opt.good{border-color:var(--accent);background:rgba(58,224,140,.11)}
+.opt.bad{border-color:var(--error);background:rgba(255,95,109,.09);opacity:.8}
+.opt.miss{border:1.5px dashed var(--accent)}
+.opt.sel{border-color:var(--blue);background:rgba(74,168,255,.1)}
+.opt:disabled{cursor:default}
+.vfrow{display:flex;gap:12px;flex-wrap:wrap;margin-top:6px}
+.vfrow .opt{flex:1;min-width:140px;justify-content:center;font-weight:800;font-size:1rem}
+.calcrow{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-start;margin-top:6px}
+.calcrow .inwrap{flex:1;min-width:200px}
+.field{width:100%;background:var(--bg2);border:1.5px solid var(--border);border-radius:10px;padding:12px;color:var(--text);font-size:1rem}
+.field:focus{outline:none;border-color:var(--accent)}
+.field.mono{font-family:'Space Mono',monospace}
+.calc-prev{font-family:'Space Mono',monospace;font-size:.8rem;color:var(--accent);min-height:1.3em;padding:4px 4px 0}
+.unit{align-self:center;color:var(--text2);font-weight:700}
+.appar{display:grid;gap:9px;margin-top:6px}
+.arow{display:grid;grid-template-columns:minmax(150px,1fr) 2fr;gap:10px;align-items:center;background:var(--bg3);border:1.5px solid var(--border);border-radius:12px;padding:9px 11px}
+.arow .at{font-weight:700;font-size:.92rem}
+.arow select{width:100%;background:var(--bg2);border:1.5px solid var(--border);border-radius:9px;padding:9px;color:var(--text);font-size:.86rem}
+.arow.numsel{grid-template-columns:1fr 150px}
+.arow.ok1{border-color:var(--accent)} .arow.ok2{border-color:var(--orange)} .arow.ko{border-color:var(--error)}
+.arow .fix{grid-column:1/-1;font-size:.82rem;color:var(--error)}
+.bounce{animation:bounce .5s}
+@keyframes bounce{0%,100%{transform:translateY(0)}30%{transform:translateY(-7px)}60%{transform:translateY(2px)}}
+.bank{display:flex;flex-wrap:wrap;gap:8px;padding:12px;background:var(--bg2);border:1.5px dashed var(--border);border-radius:12px;min-height:58px;margin:8px 0}
+.bank-l{font-size:.74rem;color:var(--text3);margin-top:6px}
+.chip{padding:8px 12px;border-radius:10px;background:var(--bg3);border:1.5px solid var(--border);font-size:.86rem;font-weight:600;text-align:left;transition:.12s}
+.chip:hover:not(:disabled){border-color:var(--blue)}
+.chip.pick{border-color:var(--gold);background:rgba(255,209,102,.13);box-shadow:0 0 0 2px rgba(255,209,102,.25)}
+.chip.ok1{border-color:var(--accent);background:rgba(58,224,140,.12)}
+.chip.ok2{border-color:var(--orange);background:rgba(255,159,67,.12)}
+.chip.ko{border-color:var(--error);background:rgba(255,95,109,.1)}
+.chip .fix{display:block;font-size:.76rem;color:var(--error);font-weight:600;margin-top:2px}
+.slots{display:grid;gap:8px;margin-top:6px}
+.slot{display:flex;align-items:center;gap:10px;padding:7px 9px;border-radius:12px;background:var(--bg3);border:1.5px dashed var(--border);min-height:50px;text-align:left;width:100%}
+.slot .sn{flex:0 0 28px;height:28px;border-radius:8px;background:var(--bg2);display:flex;align-items:center;justify-content:center;font-weight:800;font-family:'Space Mono',monospace;font-size:.82rem}
+.slot.target{border-color:var(--gold)}
+.slot .chip{flex:1}
+.slot .ph{color:var(--text3);font-size:.84rem}
+.zones{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-top:6px}
+.zone{background:var(--bg3);border:1.5px dashed var(--border);border-radius:12px;padding:10px;min-height:120px;text-align:left;width:100%;display:flex;flex-direction:column;gap:7px;align-items:stretch}
+.zone.target{border-color:var(--gold)}
+.zone .zt{font-weight:800;font-size:.86rem;margin-bottom:3px}
+
+/* ---------- FEEDBACK ---------- */
+.fb{border-radius:11px;padding:12px 14px;margin-top:12px;font-size:.89rem;border-left:4px solid}
+.fb-ok{background:rgba(58,224,140,.10);border-color:var(--accent)}
+.fb-mid{background:rgba(255,159,67,.10);border-color:var(--orange)}
+.fb-bad{background:rgba(255,95,109,.09);border-color:var(--error)}
+.fb-hint{background:rgba(255,201,77,.09);border-color:var(--warn)}
+.fb-exp{background:rgba(74,168,255,.08);border-color:var(--blue)}
+.fb h4{font-size:.92rem;margin-bottom:5px;display:flex;align-items:center;gap:7px}
+.fb ul{margin:4px 0 0 17px}
+.fb li{margin:4px 0;color:var(--text2)}
+.fb li b{color:var(--text)}
+.fb .loc{font-family:'Space Mono',monospace;background:var(--bg3);padding:1px 6px;border-radius:5px;font-size:.8em;color:var(--orange)}
+.fb p{color:var(--text2)} .fb p b{color:var(--text)}
+.qnav{display:flex;justify-content:flex-end;gap:10px;margin-top:14px;flex-wrap:wrap}
+
+/* ---------- BILAN ---------- */
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:.84rem;color:var(--text2);margin:6px 0 12px}
+table.bilan{width:100%;border-collapse:collapse;font-size:.86rem}
+table.bilan th{background:var(--bg3);padding:8px;text-align:left;font-size:.68rem;text-transform:uppercase;letter-spacing:.6px;color:var(--text3)}
+table.bilan td{padding:8px;border-bottom:1px solid var(--border)}
+table.bilan td.c,table.bilan th.c{text-align:center;font-family:'Space Mono',monospace}
+.grade{text-align:center;padding:10px 10px 4px}
+.grade .medal{font-size:3.6rem;line-height:1}
+.grade .gr{font-size:2rem;font-weight:800;margin:6px 0 2px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin:14px 0}
+.stat{background:var(--bg3);border:1px solid var(--border);border-radius:11px;padding:12px;text-align:center}
+.stat .v{font-size:1.35rem;font-weight:800;font-family:'Space Mono',monospace}
+.stat .k{font-size:.72rem;color:var(--text3)}
+.predres{margin-top:10px;padding:11px 13px;border-radius:11px;background:rgba(255,209,102,.07);border:1px solid rgba(255,209,102,.3);font-size:.88rem}
+.crit{border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-top:10px;background:var(--bg2)}
+.crit-h{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-weight:800}
+.st-badge{font-size:.74rem;font-weight:800;padding:3px 9px;border-radius:999px;white-space:nowrap}
+.st-atteint{background:rgba(58,224,140,.15);color:var(--accent)}
+.st-encours{background:rgba(255,159,67,.15);color:var(--orange)}
+.st-nonatteint{background:rgba(255,95,109,.15);color:var(--error)}
+.ind{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-top:1px solid var(--border);margin-top:8px;font-size:.88rem;flex-wrap:wrap}
+.ind .it{flex:1;min-width:200px}
+.revoir{width:100%;font-size:.82rem;color:var(--text2);background:rgba(74,168,255,.07);border-radius:8px;padding:7px 10px}
+.revoir i{color:var(--text)}
+
+/* ---------- MODALS ---------- */
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(8px);z-index:200;display:flex;align-items:center;justify-content:center;padding:14px}
+.modal-box{background:var(--card);border:1px solid var(--border);border-radius:16px;width:100%;max-width:620px;max-height:88vh;display:flex;flex-direction:column;animation:slideUp .28s cubic-bezier(.2,.9,.3,1)}
+@keyframes slideUp{from{opacity:0;transform:translateY(26px)}to{opacity:1;transform:none}}
+.modal-h{display:flex;align-items:center;gap:10px;padding:15px 18px;border-bottom:1px solid var(--border)}
+.modal-h h3{flex:1;font-size:1.02rem}
+.modal-b{padding:18px;overflow:auto}
+.modal-f{padding:14px 18px;border-top:1px solid var(--border);display:flex;gap:9px;justify-content:flex-end;flex-wrap:wrap}
+.close-x{font-size:1.4rem;color:var(--text3);padding:0 5px;line-height:1}
+.close-x:hover{color:var(--text)}
+.err-msg{color:var(--error);font-size:.85rem;margin-top:9px;min-height:19px}
+.ref-search{margin-bottom:10px}
+.ref-list{max-height:52vh;overflow:auto}
+.ref-item{display:flex;gap:10px;padding:7px 9px;border-bottom:1px solid var(--border);font-size:.86rem}
+.ref-item .k{font-family:'Space Mono',monospace;color:var(--accent);font-weight:700;flex:0 0 70px}
+.ref-item .v{color:var(--text2)}
+.ref-grp{padding:12px 9px 4px;color:var(--orange);font-weight:800;font-size:.76rem;text-transform:uppercase;letter-spacing:.8px}
+#lbOverlay{display:none;position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,.75);backdrop-filter:blur(8px)}
+#lbOverlay .lb-box{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:26px 22px;width:95%;max-width:620px;max-height:85vh;overflow-y:auto;box-shadow:0 0 40px rgba(0,0,0,.5)}
+.lb-tabs{display:flex;gap:8px;margin:6px 0 16px}
+.lb-tabs button{flex:1;padding:10px;border-radius:10px;font-weight:700;font-size:.85rem}
+#lbTitle{font-size:1.02rem;margin-right:30px}
+
+/* ---------- EFFETS ---------- */
+.particle{position:fixed;width:8px;height:8px;border-radius:50%;pointer-events:none;z-index:400;animation:pfly .8s ease-out forwards}
+@keyframes pfly{to{transform:translate(var(--dx),var(--dy)) scale(.3);opacity:0}}
+.floatxp{position:fixed;z-index:401;pointer-events:none;font-weight:800;color:var(--gold);font-family:'Space Mono',monospace;font-size:1.05rem;text-shadow:0 0 10px rgba(255,209,102,.6);animation:fup 1.1s ease-out forwards}
+@keyframes fup{to{transform:translateY(-60px);opacity:0}}
+.combo{position:fixed;left:50%;top:40%;transform:translate(-50%,-50%);z-index:402;pointer-events:none;font-size:2.4rem;font-weight:800;color:var(--orange);text-shadow:0 0 24px rgba(255,159,67,.8);animation:cflash 1.1s ease-out forwards;white-space:nowrap}
+@keyframes cflash{0%{opacity:0;transform:translate(-50%,-50%) scale(.6)}25%{opacity:1;transform:translate(-50%,-50%) scale(1.12)}100%{opacity:0;transform:translate(-50%,-60%) scale(1)}}
+#toastHost{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:450;display:flex;flex-direction:column;gap:8px;align-items:center;pointer-events:none}
+.toast{background:var(--card);border:1.5px solid var(--gold);border-radius:14px;padding:11px 16px;display:flex;gap:11px;align-items:center;box-shadow:0 10px 30px rgba(0,0,0,.5);animation:slideUp .3s ease}
+.toast .ti{font-size:1.7rem}
+.toast .tt{font-size:.72rem;color:var(--gold);font-weight:800;letter-spacing:.6px}
+.toast .tn{font-weight:800}
+.rankup{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.82);display:flex;align-items:center;justify-content:center;overflow:hidden}
+.rankup .rays{position:absolute;width:160vmax;height:160vmax;background:repeating-conic-gradient(rgba(255,209,102,.13) 0 10deg,transparent 10deg 20deg);animation:spin 14s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.rankup .rcard{position:relative;background:var(--card);border:2px solid var(--gold);border-radius:20px;padding:30px 34px;text-align:center;max-width:380px;animation:pop .5s cubic-bezier(.2,1.5,.4,1)}
+@keyframes pop{from{transform:scale(.5);opacity:0}to{transform:scale(1);opacity:1}}
+.rankup .ri{font-size:4rem;line-height:1}
+.rankup .rt{color:var(--gold);font-weight:800;letter-spacing:1px;margin:10px 0 2px;font-size:.85rem}
+.rankup .rn{font-size:1.7rem;font-weight:800;margin-bottom:14px}
+.confetti{position:fixed;top:-12px;width:9px;height:14px;z-index:300;pointer-events:none;animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(104vh) rotate(760deg);opacity:0}}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+
+/* ---------- IMPRESSION ---------- */
+.fiche{display:none}
+@media print{
+  body *{visibility:hidden}
+  .fiche,.fiche *{visibility:visible}
+  .fiche{display:block !important;position:absolute;left:0;top:0;width:100%;background:#fff;color:#111;padding:20px;font-family:Arial,sans-serif;font-size:12px}
+  .fiche h1{font-size:18px;margin-bottom:4px} .fiche h2{font-size:14px;margin:14px 0 6px}
+  .fiche table{width:100%;border-collapse:collapse;margin-top:6px} .fiche td,.fiche th{border:1px solid #999;padding:5px 6px;text-align:left;vertical-align:top}
+  .fiche th{background:#eee}
+}
+
+/* ---------- RESPONSIVE ---------- */
+@media(max-width:768px){
+  .wrap{padding:12px 12px 50px}
+  .hero h1{font-size:1.6rem}
+  .doc{font-size:.78rem;padding:12px}
+  .path:before{left:24px}
+  .pnode{left:24px}
+  .pnode-row,.pnode-row.left,.pnode-row.right{justify-content:flex-end}
+  .pnode-row .pcard{width:calc(100% - 62px)}
+  .arow,.arow.numsel{grid-template-columns:1fr}
+  .refs{margin-left:0}
+}
+@media(max-width:480px){
+  .brand-t{display:none}
+  .badge{font-size:.72rem;padding:4px 8px}
+  .btn{padding:10px 14px;font-size:.86rem}
+  .grade .medal{font-size:3rem}
+  .xp-next{display:none}
+  .navdot{width:23px;height:23px;font-size:.68rem}
+  .card{padding:15px}
+}
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important}
+}
+
+/* ---------- TABLEAUX À COMPLÉTER ---------- */
+.tabwrap{overflow-x:auto;margin-top:6px}
+table.tab{width:100%;border-collapse:separate;border-spacing:0 4px;font-size:.88rem}
+table.tab th{font-size:.66rem;text-transform:uppercase;letter-spacing:.6px;color:var(--text3);text-align:left;padding:2px 9px 4px;font-weight:700}
+table.tab th.r{text-align:right}
+table.tab td{padding:7px 9px;background:var(--bg3);vertical-align:middle}
+table.tab td:first-child{border-radius:10px 0 0 10px;font-weight:600}
+table.tab td:last-child{border-radius:0 10px 10px 0}
+table.tab tr.bold td{background:rgba(255,209,102,.07);font-weight:800}
+table.tab td.calc{color:var(--text2);font-family:'Space Mono',monospace;font-size:.76rem;line-height:1.45}
+table.tab td.calc .hid{color:var(--text3);font-family:'Outfit',sans-serif;font-style:italic;font-size:.78rem}
+table.tab td.given{font-family:'Space Mono',monospace;font-weight:700;text-align:right;white-space:nowrap}
+table.tab td.cin{min-width:140px;text-align:right}
+table.tab td.ctr{text-align:center;font-family:'Space Mono',monospace;white-space:nowrap}
+table.tab input.tin{width:100%;min-width:120px;background:var(--bg2);border:1.5px solid var(--border);border-radius:8px;padding:9px 8px;color:var(--text);font-family:'Space Mono',monospace;font-size:.9rem;text-align:right}
+table.tab input.tin:focus{outline:none;border-color:var(--accent)}
+table.tab input.tin:disabled{opacity:1}
+table.tab td.ok1 input{border-color:var(--accent);background:rgba(58,224,140,.11)}
+table.tab td.ok2 input{border-color:var(--orange);background:rgba(255,159,67,.11)}
+table.tab td.ko input{border-color:var(--error);background:rgba(255,95,109,.09)}
+table.tab td.bad input{border-color:var(--error);background:rgba(255,95,109,.10)}
+table.tab .fix{display:block;color:var(--error);font-size:.76rem;font-family:'Space Mono',monospace;margin-top:3px;font-weight:700}
+table.tab .ecfnote{display:block;color:var(--blue);font-size:.74rem;margin-top:4px;text-align:left;line-height:1.35}
+table.tab .xex{display:block;font-size:.72rem;color:var(--text2);margin-top:4px;text-align:left;font-family:'Space Mono',monospace;line-height:1.4}
+table.tab .calc-hint{text-align:right}
+.reftable{width:100%;border-collapse:collapse;font-size:.84rem;margin:6px 0 12px}
+.reftable th{background:var(--bg3);padding:7px 9px;text-align:left;font-size:.7rem;text-transform:uppercase;letter-spacing:.5px;color:var(--text3)}
+.reftable td{padding:7px 9px;border-bottom:1px solid var(--border)}
+.reftable td.r,.reftable th.r{text-align:right;font-family:'Space Mono',monospace;white-space:nowrap}
+.refsec{color:var(--gold);font-weight:800;font-size:.95rem;margin:12px 0 4px}
+.refnote{font-size:.84rem;color:var(--text2);background:var(--bg2);border-radius:9px;padding:9px 11px;margin:6px 0 12px}
+.refnote b{color:var(--text)}
+.toolbar{display:flex;gap:7px;flex-wrap:wrap;margin:4px 0 10px}
+.chemin{width:100%;border-collapse:separate;border-spacing:0 3px;font-size:.88rem;margin-top:6px}
+.chemin td{padding:6px 10px;background:var(--bg2)}
+.chemin td:first-child{border-radius:8px 0 0 8px;font-weight:700;color:var(--text)}
+.chemin td:last-child{border-radius:0 8px 8px 0;color:var(--text2);font-size:.82rem}
+@media(max-width:640px){
+  table.tab,table.tab tbody{display:block;width:100%}
+  table.tab thead{display:none}
+  table.tab tr{display:block;background:var(--bg3);border-radius:11px;padding:9px 11px;margin-bottom:8px}
+  table.tab tr.bold{background:rgba(255,209,102,.08)}
+  table.tab td{display:block;background:none !important;padding:3px 0;border-radius:0 !important;text-align:left}
+  table.tab td.given,table.tab td.cin,table.tab td.ctr{text-align:left}
+  table.tab td:before{content:attr(data-l);display:block;font-size:.62rem;text-transform:uppercase;letter-spacing:.7px;color:var(--text3);font-weight:700;margin-bottom:2px}
+  table.tab td.nol:before{display:none}
+  table.tab td.calc:empty{display:none}
+}
+@media(max-width:640px){ table.tab td:empty{display:none} }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-in">
+    <div class="brand"><span class="logo">💶</span><span class="brand-t">Rémunérations 2A · ONSS et bonus</span></div>
+    <div class="spacer"></div>
+    <span class="badge mono" id="globalTimer" style="display:none">⏱️ 00:00</span>
+    <span class="badge org" id="hStreak" title="Série de bonnes réponses du premier coup">🔥 0</span>
+    <span class="badge acc" id="hXP">⭐ 0 XP</span>
+    <button class="badge" id="hSound" onclick="toggleSound()" aria-label="Activer ou couper le son">🔇</button>
+    <button class="badge" onclick="goHub()" aria-label="Ouvrir le parcours">🗺️</button>
+  </div>
+  <div class="hud2">
+    <span class="xp-rank" id="hRank"></span>
+    <div class="xpbar"><div class="xpfill" id="hFill"></div><div id="hMarks"></div></div>
+    <span class="xp-next" id="hNext"></span>
+    <div class="navdots" id="hDots"></div>
+  </div>
+</header>
+
+<main class="wrap" id="main"></main>
+
+<div id="modalHost"></div>
+<div id="toastHost"></div>
+<div id="printFiche" class="fiche"></div>
+
+<!-- ===== MODAL CLASSEMENT ===== -->
+<div id="lbOverlay" onclick="if(event.target===this)closeLB()">
+  <div class="lb-box">
+    <button onclick="closeLB()" class="close-x" style="position:absolute;top:12px;right:14px" aria-label="Fermer">✕</button>
+    <h3 id="lbTitle">🏆 Classement</h3>
+    <div class="lb-tabs">
+      <button id="lbTabApp" onclick="switchLBTab('app')">🏆 Cette application</button>
+      <button id="lbTabGlobal" onclick="switchLBTab('global')">🌍 Classement général</button>
+    </div>
+    <div id="lbContent"><div class="center muted" style="padding:40px">Chargement…</div></div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   LES RÉMUNÉRATIONS — PARTIE 2A : ONSS ET BONUS À L'EMPLOI
+   Institut Saint-Luc Frameries — 6e Technicien en comptabilité
+   ============================================================ */
+const TRACKING = {
+  appName: "Les rémunérations — Partie 2A : ONSS et bonus à l'emploi",
+  totalNiveaux: 3,
+  sessionId: null,
+  scriptUrl: "https://script.google.com/macros/s/AKfycbx9bRMVuHU2mgFLii1KcQXD3LdZahnDH1rf1cWv9RuDvQAt0l3VtLtxzmbH7MtpJWRjfA/exec"
+};
+const APPCFG = {
+  logo:'💶', short:"Rémunérations 2A · ONSS et bonus",
+  title:"Les rémunérations — Partie 2A",
+  sub:"ONSS et bonus à l'emploi · 6e Technicien en comptabilité · montants 2026",
+  desc:"Du salaire brut au salaire imposable : comprends le chemin du brut au net, puis calcule pas à pas la retenue ONSS d'un employé et d'un ouvrier, le bonus à l'emploi (volets A et B) et le salaire imposable. Les tableaux du cours sont toujours à portée de clic.",
+  refs:['bonus'],
+  bravo:"Tu maîtrises l'ONSS et le bonus à l'emploi. Tu es prêt(e) pour la partie 2B : le précompte professionnel."
+};
+
+const CH_FICHE = "La fiche de paie : du brut au net";
+const CH_SECU  = "L'ONSS et la sécurité sociale";
+const CH_ONSS  = "La retenue ONSS (cotisations personnelles)";
+const CH_BONUS = "Le bonus à l'emploi";
+
+const CRITERES = [
+  { id:'C1', nom:"Comprendre le passage du brut au net", indicateurs:[
+    { id:'I1', texte:"J'explique les étapes et les termes du passage du brut au net",
+      obj:"expliquer les étapes et les mots du passage du salaire brut au salaire net",
+      chapitres:[CH_FICHE, CH_SECU], revoir:"le chemin du brut au net, le tableau « Les mots à connaître » et le rôle des organismes de sécurité sociale" }
+  ]},
+  { id:'C2', nom:"Calculer l'ONSS, le bonus à l'emploi et le salaire imposable", indicateurs:[
+    { id:'I2', texte:"Je calcule la retenue ONSS d'un employé et d'un ouvrier",
+      obj:"calculer la retenue ONSS d'un employé (100 %) et d'un ouvrier (108 %)",
+      chapitres:[CH_ONSS], revoir:"l'encadré « À retenir : employé ou ouvrier ? » et l'exemple des deux travailleurs à 2.500,00 €" },
+    { id:'I3', texte:"Je calcule le bonus à l'emploi : volets A et B, plafond",
+      obj:"calculer les volets A et B du bonus à l'emploi et appliquer le plafond",
+      chapitres:[CH_BONUS], revoir:"les tableaux des volets A et B, les 3 règles à connaître et l'exemple d'Inès Lambert" },
+    { id:'I4', texte:"Je calcule le salaire imposable",
+      obj:"calculer le salaire imposable (brut − ONSS + bonus)",
+      chapitres:[CH_BONUS], revoir:"l'étape 4 de la méthode : salaire imposable = brut − ONSS + bonus à l'emploi" }
+  ]}
+];
+
+/* ---------- Générateur des tableaux d'exercices (lignes exactes du cours) ---------- */
+function bonusEx(o){
+  const H = {
+    base:"Le travailleur est-il employé ou ouvrier ? Employé : 100 % du brut ; ouvrier : 108 % du brut.",
+    onss:"Applique 13,07 % à la base ONSS de la ligne précédente.",
+    A:"Situe le salaire brut à 100 % dans le tableau du volet A (📊), dans la bonne colonne (Employés ou Ouvriers).",
+    B:"Situe le salaire brut à 100 % dans le tableau du volet B (📊), dans la bonne colonne. Au-delà de 2.937,93 €, il n'y a plus de volet B.",
+    tot:"Additionne A + B, puis compare avec l'ONSS : le bonus ne peut jamais dépasser l'ONSS (règle 3).",
+    imp:"Salaire imposable = salaire brut − cotisations ONSS + bonus à l'emploi."
+  };
+  const row = (lbl,k,ind,extra) => ({ c:[lbl, {x:k}, Object.assign({k, ind, h:H[k], lbl}, extra)] });
+  return { type:'tab', pts:12, short:o.short, brut:o.brut,
+    q:o.q, data:o.data,
+    head:['Élément','Calcul','Montant (€)'],
+    rows:[
+      { c:["Salaire brut", "", {g:fmt(o.brut)}] },
+      row("Base ONSS (100 % ou 108 %)", 'base', 'I2', o.base),
+      row("Cotisations ONSS (13,07 %)", 'onss', 'I2', Object.assign({f:'onss'}, o.onss)),
+      row("Bonus – volet A", 'A', 'I3', o.A),
+      row("Bonus – volet B", 'B', 'I3', o.B),
+      row("Total du bonus (plafonné à l'ONSS)", 'tot', 'I3', Object.assign({f:'tot'}, o.tot)),
+      Object.assign(row("Salaire imposable", 'imp', 'I4', Object.assign({f:'imp'}, o.imp)), {b:true})
+    ],
+    exp:o.exp };
+}
+const E_OUBLI = "Erreur fréquente : as-tu ajouté le bonus à l'emploi ? Salaire imposable = brut − ONSS + bonus.";
+
+const LEVELS = [
+/* ================= MISSION 1 ================= */
+{ id:'L1', icon:'🧭', title:"Le chemin du brut au net",
+  desc:"Les étapes de la fiche de paie, les mots à connaître et les organismes de la sécurité sociale.",
+  theory:`<p>Toute entreprise doit garantir une <b>rémunération minimale</b> : le barème du secteur, fixé par une <b>CCT</b> (convention collective de travail) conclue en commission paritaire, ou à défaut le <b>RMMMG</b> (revenu minimum mensuel moyen garanti) : <b>2.233,61 € brut par mois</b> au 1er juillet 2026.</p>
+  <p>Le salaire évolue grâce à l'<b>indexation</b> (il suit le coût de la vie mesuré par l'indice santé), aux <b>augmentations sectorielles</b> et aux <b>augmentations d'entreprise</b>.</p>
+  <p>Chaque mois, la <b>fiche de paie</b> montre comment on passe du salaire brut au salaire net : la retenue pour la sécurité sociale (ONSS), le bonus à l'emploi pour les bas salaires, puis l'avance sur l'impôt (précompte professionnel). Observe l'exemple ci-dessous : tu apprendras à calculer chacune de ces lignes.</p>`,
+  example:`<b>Emma Delattre</b>, employée administrative chez SRL Les Ateliers du Borinage (fictive), isolée, sans enfant, temps plein — octobre 2026.
+  <div class="scroll"><table class="mini"><thead><tr><th>Libellé</th><th class="r">Base</th><th class="r">Taux</th><th class="r">Montant (€)</th></tr></thead><tbody>
+  <tr><td>Salaire mensuel brut</td><td></td><td></td><td class="r">2.800,00</td></tr>
+  <tr><td>Cotisations ONSS personnelles</td><td class="r">2.800,00</td><td class="r">13,07 %</td><td class="r">− 365,96</td></tr>
+  <tr><td>Bonus à l'emploi social (volet A + volet B)</td><td></td><td></td><td class="r">+ 164,75</td></tr>
+  <tr><td><b>Salaire imposable</b></td><td></td><td></td><td class="r"><b>2.598,79</b></td></tr>
+  <tr><td>Précompte professionnel (formule-clé)</td><td></td><td></td><td class="r">− 423,29</td></tr>
+  <tr><td>Réduction : bonus à l'emploi fiscal</td><td></td><td></td><td class="r">+ 65,71</td></tr>
+  <tr><td>Cotisation spéciale de sécurité sociale</td><td></td><td></td><td class="r">pour mémoire</td></tr>
+  <tr><td><b>Salaire net (avant CSS)</b></td><td></td><td></td><td class="r"><b>2.241,21</b></td></tr></tbody></table></div>`,
+  plus:`<b>La rémunération selon la loi</b> comprend le salaire en espèces, les pourboires et les avantages évaluables en argent (avantages en nature, remboursements de frais, intervention dans l'abonnement de transport…), mais aussi le sursalaire des heures supplémentaires, les jours fériés et le salaire garanti en cas d'incapacité. Certains montants ne sont pas soumis aux cotisations : remboursement des frais de déplacement domicile–travail, outils et vêtements de travail…`,
+  questions:[
+  { type:'appar', ind:'I1', pts:8, short:"Les mots à connaître",
+    q:"Associe chaque terme de la fiche de paie à sa définition.",
+    items:[ {t:"Cotisations ONSS personnelles", a:'onss'}, {t:"Bonus à l'emploi", a:'bonus'}, {t:"Salaire imposable", a:'imp'},
+            {t:"Précompte professionnel", a:'pp'}, {t:"Cotisation spéciale de sécurité sociale (CSS)", a:'css'}, {t:"Salaire coût", a:'cout'} ],
+    options:[ {k:'onss', t:"Partie du salaire brut retenue pour financer la sécurité sociale : 13,07 %"},
+              {k:'bonus', t:"Réduction des cotisations ONSS et du précompte professionnel pour les bas salaires"},
+              {k:'imp', t:"Salaire brut − cotisations ONSS + bonus à l'emploi social : la base du calcul du précompte"},
+              {k:'pp', t:"Avance sur l'impôt des personnes physiques, retenue chaque mois et versée au SPF Finances"},
+              {k:'css', t:"Retenue supplémentaire qui dépend des revenus du ménage, non calculée dans ce cours"},
+              {k:'cout', t:"Ce que le travailleur coûte réellement à l'employeur : brut + cotisations patronales + autres frais"},
+              {k:'x1', t:"Montant réellement versé au travailleur, sur son compte"},
+              {k:'x2', t:"Montant de la rémunération avant toute retenue sociale ou fiscale"} ],
+    hint:"Pour chaque terme, demande-toi s'il s'agit d'une retenue, d'une réduction, d'un sous-total ou d'un coût pour l'employeur.",
+    exp:"<b>Cotisations ONSS personnelles</b> : 13,07 % du brut pour la sécurité sociale · <b>Bonus à l'emploi</b> : réduction de l'ONSS (bonus social) et du précompte (bonus fiscal) pour les bas salaires · <b>Salaire imposable</b> : brut − ONSS + bonus, base du précompte · <b>Précompte professionnel</b> : avance mensuelle sur l'IPP (impôt des personnes physiques) · <b>CSS</b> : dépend des revenus du ménage · <b>Salaire coût</b> : brut + cotisations patronales + autres frais. Les deux définitions restantes sont celles du <b>salaire net</b> et du <b>salaire brut</b>." },
+
+  { type:'ordre', ind:'I1', pts:8, short:"Le chemin du brut au net",
+    q:"Remets dans l'ordre les lignes du chemin du brut au net, du haut vers le bas de la fiche de paie.",
+    steps:[ "Salaire brut", "− Cotisations ONSS personnelles", "+ Bonus à l'emploi social", "= Salaire imposable",
+            "− Précompte professionnel", "− Cotisation spéciale de sécurité sociale", "= Salaire net" ],
+    distract:[ "+ Cotisations patronales ONSS", "− Bonus à l'emploi social" ],
+    hint:"Le bonus à l'emploi social diminue l'ONSS : il intervient donc juste après elle. Et quel montant sert de base au précompte ?",
+    exp:"On part du <b>salaire brut</b> (montant fixé dans le contrat), on retire les <b>cotisations ONSS personnelles</b> (13,07 %, sur 108 % pour un ouvrier), on ajoute le <b>bonus à l'emploi social</b> (bas salaires) et on obtient le <b>salaire imposable</b>, base de l'impôt. On retire ensuite le <b>précompte professionnel</b> (après déduction du bonus fiscal) et la <b>CSS</b>, pour arriver au <b>salaire net</b>. Les cotisations patronales ne sont jamais retenues au travailleur, et le bonus s'ajoute : il n'est jamais retiré." },
+
+  { type:'appar', ind:'I1', pts:8, short:"Les organismes de la sécurité sociale",
+    q:"L'ONSS répartit les cotisations entre les branches de la sécurité sociale. Associe chaque organisme à son rôle.",
+    items:[ {t:"INAMI", a:'inami'}, {t:"ONEM", a:'onem'}, {t:"SFP", a:'sfp'}, {t:"ONVA", a:'onva'}, {t:"Fedris", a:'fedris'} ],
+    options:[ {k:'inami', t:"Remboursement des soins de santé et indemnités d'incapacité de travail, payés par les mutualités"},
+              {k:'onem', t:"Allocations de chômage, payées par la CAPAC ou par un syndicat"},
+              {k:'sfp', t:"Pensions des travailleurs salariés"},
+              {k:'onva', t:"Pécule de vacances des ouvriers"},
+              {k:'fedris', t:"Accidents du travail et maladies professionnelles"},
+              {k:'x1', t:"Perçoit le précompte professionnel retenu sur les salaires"},
+              {k:'x2', t:"Calcule les salaires pour le compte de l'employeur"} ],
+    hint:"Développe les sigles : I.N.A.M.I. = Institut national d'assurance maladie-invalidité, O.N.E.M. = Office national de l'emploi, S.F.P. = Service fédéral des Pensions…",
+    exp:"<b>INAMI</b> (Institut national d'assurance maladie-invalidité) : soins de santé et indemnités, via les mutualités · <b>ONEM</b> (Office national de l'emploi) : chômage, via la CAPAC ou un syndicat · <b>SFP</b> (Service fédéral des Pensions, anciennement ONP) : pensions · <b>ONVA</b> (Office national des vacances annuelles) : pécule de vacances des ouvriers · <b>Fedris</b> (Agence fédérale des risques professionnels, fusion du FAT et du FMP en 2017) : accidents du travail et maladies professionnelles. Les deux autres rôles sont ceux du SPF Finances et d'un secrétariat social. Depuis 2019, les allocations familiales sont gérées par les Régions (en Wallonie : l'AVIQ et les caisses d'allocations familiales)." }
+  ]
+},
+
+/* ================= MISSION 2 ================= */
+{ id:'L2', icon:'🧮', title:"L'ONSS et le bonus à l'emploi (1)",
+  desc:"Exercices a, b et c : bonus plafonné, volet B dégressif, volet A dégressif.",
+  theory:`<p><b>La retenue ONSS</b> (cotisations personnelles) s'élève à <b>13,07 %</b> :</p>
+  <ul><li><b>employé</b> : ONSS = salaire brut × 13,07 % ;</li>
+  <li><b>ouvrier</b> : ONSS = (salaire brut × 108 %) × 13,07 %. Le pécule de vacances simple des ouvriers est payé par une caisse de vacances et n'est pas soumis aux cotisations : pour compenser, on calcule leur ONSS sur 108 % du brut.</li></ul>
+  <p><b>Le bonus à l'emploi social</b> diminue l'ONSS des bas salaires, sans que le brut augmente. Il se calcule en deux parties que l'on additionne : le <b>volet A</b> (bas salaires) et le <b>volet B</b> (très bas salaires). Les montants sont dans le tableau 📊.</p>
+  <p><b>Les 3 règles :</b> ① S = salaire brut à 100 %, même pour un ouvrier (on lit la colonne « Ouvriers ») ; ② bonus total = volet A + volet B ; ③ le bonus ne peut jamais dépasser l'ONSS : si A + B est plus grand, on réduit le volet B (volet B retenu = ONSS − volet A).</p>
+  <p><b>Méthode :</b> ① calculer l'ONSS ; ② situer le brut dans le tableau du volet A, puis du volet B ; ③ additionner A + B et vérifier le plafond ; ④ salaire imposable = brut − ONSS + bonus.</p>`,
+  example:`<b>Deux travailleurs gagnent chacun 2.500,00 € brut.</b> Employé : 2.500,00 × 13,07 % = <b>326,75 €</b>. Ouvrier : 2.500,00 × 108 % = 2.700,00 → 2.700,00 × 13,07 % = <b>352,89 €</b>.<br><br>
+  <b>Inès Lambert</b>, employée à temps plein, isolée, 2.000,00 € brut :
+  <div class="scroll"><table class="mini"><thead><tr><th>Élément</th><th>Calcul</th><th class="r">Montant (€)</th></tr></thead><tbody>
+  <tr><td>Salaire brut</td><td></td><td class="r">2.000,00</td></tr>
+  <tr><td>Cotisations ONSS</td><td>2.000,00 × 13,07 %</td><td class="r">261,40</td></tr>
+  <tr><td>Bonus – volet A</td><td>2.000,00 ≤ 2.937,93 → montant plein</td><td class="r">127,54</td></tr>
+  <tr><td>Bonus – volet B</td><td>2.000,00 ≤ 2.300,62 → montant plein</td><td class="r">171,99</td></tr>
+  <tr><td>Total A + B</td><td>127,54 + 171,99 = 299,53 &gt; ONSS (261,40) → plafond !</td><td class="r">299,53</td></tr>
+  <tr><td>Volet B retenu</td><td>261,40 − 127,54</td><td class="r">133,86</td></tr>
+  <tr><td>Bonus à l'emploi retenu</td><td>127,54 + 133,86 (= l'ONSS)</td><td class="r">261,40</td></tr>
+  <tr><td><b>Salaire imposable</b></td><td>2.000,00 − 261,40 + 261,40</td><td class="r"><b>2.000,00</b></td></tr></tbody></table></div>
+  Inès ne paie donc aucune cotisation ONSS : tout est compensé par le bonus.`,
+  plus:`Les 13,07 % de la cotisation personnelle se répartissent entre les branches de la sécurité sociale : pensions 7,50 % · assurance maladie-invalidité, indemnités 1,15 % · assurance maladie-invalidité, soins de santé 3,55 % · chômage 0,87 %.`,
+  questions:[
+  bonusEx({ short:"a) Lina Dubois — employée", brut:2150,
+    q:"<b>a)</b> Madame Lina Dubois, célibataire, est employée dans une agence bancaire à Mons. Son salaire mensuel brut est de <b>2.150,00 €</b>. Calcule l'ONSS, le bonus à l'emploi (volets A et B) et le salaire imposable.",
+    data:"Statut : <b>employée</b> · temps plein · salaire mensuel brut : <b>2.150,00 €</b>",
+    base:{ v:2150, x:"employée : 100 % du brut", errs:[{v:2322, h:"Lina est employée : sa base ONSS est 100 % du brut (108 % ne concerne que les ouvriers)."}] },
+    onss:{ v:281.01, x:"2.150,00 × 13,07 % = 281,005 → 281,01" },
+    A:{ v:127.54, x:"2.150,00 ≤ 2.937,93 → montant plein (colonne Employés)", errs:[{v:137.74, h:"Tu as lu la colonne Ouvriers : Lina est employée."}] },
+    B:{ v:171.99, alt:[153.47], x:"2.150,00 ≤ 2.300,62 → montant plein (avant plafond)", errs:[{v:185.75, h:"Tu as lu la colonne Ouvriers : Lina est employée."}] },
+    tot:{ v:281.01, x:"127,54 + 171,99 = 299,53 &gt; ONSS → plafonné : volet B retenu = 281,01 − 127,54 = 153,47 ; bonus = 281,01", errs:[{v:299.53, h:"A + B dépasse l'ONSS de Lina : relis la règle 3 (le bonus ne peut jamais dépasser l'ONSS)."}] },
+    imp:{ v:2150, x:"2.150,00 − 281,01 + 281,01", errs:[{f:"impSansBonus", h:E_OUBLI}] },
+    exp:"Lina est employée : sa base ONSS est son brut, et son ONSS vaut <b>281,01 €</b>. Son salaire (2.150,00 €) est sous les deux premiers seuils : volets A et B pleins, 127,54 + 171,99 = 299,53 €. Ce total dépasse l'ONSS : le bonus est <b>plafonné à 281,01 €</b> (volet B retenu : 153,47 €). Lina ne paie donc aucune ONSS et son salaire imposable reste <b>2.150,00 €</b>." }),
+
+  bonusEx({ short:"b) Rayan Benali — ouvrier", brut:2450,
+    q:"<b>b)</b> Monsieur Rayan Benali est ouvrier coiffeur (CP 314). Son salaire mensuel brut est de <b>2.450,00 €</b>. Calcule l'ONSS, le bonus à l'emploi (volets A et B) et le salaire imposable.",
+    data:"Statut : <b>ouvrier</b> · temps plein · salaire mensuel brut : <b>2.450,00 €</b>",
+    base:{ v:2646, x:"2.450,00 × 108 %", errs:[{v:2450, h:"Rayan est ouvrier : sa base ONSS n'est pas 100 % du brut."}] },
+    onss:{ v:345.83, x:"2.646,00 × 13,07 % = 345,8322 → 345,83", errs:[{v:320.22, h:"Tu as appliqué 13,07 % au brut. Pour un ouvrier, on l'applique à la base de 108 %."}] },
+    A:{ v:137.74, x:"2.450,00 ≤ 2.937,93 → montant plein (colonne Ouvriers)", errs:[{v:127.54, h:"Tu as lu la colonne Employés : Rayan est ouvrier."}] },
+    B:{ v:142.21, x:"185,75 − 0,2915 × (2.450,00 − 2.300,62) = 185,75 − 43,54", errs:[
+         {v:185.75, h:"2.450,00 € dépasse 2.300,62 € : on n'est plus dans la ligne du montant plein, mais dans la ligne dégressive du tableau."},
+         {v:131.67, h:"Tu as utilisé la formule des employés : Rayan est ouvrier (185,75 et 0,2915)."},
+         {v:85.07, h:"Pour lire le tableau du bonus, S est le brut à 100 % (2.450,00), même pour un ouvrier : la base de 108 % ne sert qu'à l'ONSS."} ] },
+    tot:{ v:279.95, x:"137,74 + 142,21 = 279,95 ≤ ONSS (345,83) → pas de plafond" },
+    imp:{ v:2384.12, x:"2.450,00 − 345,83 + 279,95", errs:[{f:"impSansBonus", h:E_OUBLI}] },
+    exp:"Rayan est ouvrier : base ONSS = 2.450,00 × 108 % = 2.646,00 €, d'où une ONSS de <b>345,83 €</b>. Pour le bonus, on lit les tableaux avec le brut à 100 % (2.450,00 €), dans la colonne Ouvriers : volet A plein (<b>137,74 €</b>) ; volet B dégressif car 2.450,00 &gt; 2.300,62 : 185,75 − 0,2915 × 149,38 = <b>142,21 €</b>. Total 279,95 €, sous l'ONSS : pas de plafond. Imposable : 2.450,00 − 345,83 + 279,95 = <b>2.384,12 €</b>." }),
+
+  bonusEx({ short:"c) Lucas Peeters — employé", brut:2950,
+    q:"<b>c)</b> Monsieur Lucas Peeters, marié, est employé dans une grande entreprise de vente au détail (CP 311). Son salaire mensuel brut est de <b>2.950,00 €</b>. Calcule l'ONSS, le bonus à l'emploi (volets A et B) et le salaire imposable.",
+    data:"Statut : <b>employé</b> · temps plein · salaire mensuel brut : <b>2.950,00 €</b>",
+    base:{ v:2950, x:"employé : 100 % du brut", errs:[{v:3186, h:"Lucas est employé : sa base ONSS est 100 % du brut."}] },
+    onss:{ v:385.57, x:"2.950,00 × 13,07 % = 385,565 → 385,57" },
+    A:{ v:124.23, x:"127,54 − 0,2739 × (2.950,00 − 2.937,93) = 127,54 − 3,31", errs:[
+         {v:127.54, h:"2.950,00 € dépasse 2.937,93 € : on n'est plus dans la ligne du montant plein du volet A, mais dans la ligne dégressive."},
+         {v:134.17, h:"Tu as utilisé la formule des ouvriers : Lucas est employé (127,54 et 0,2739)."} ] },
+    B:{ v:0, x:"2.950,00 &gt; 2.937,93 → pas de volet B", errs:[{v:171.99, h:"Au-delà de 2.937,93 €, il n'y a plus de volet B."}, {v:-3.28, h:"Au-delà de 2.937,93 €, le volet B vaut 0 (il ne peut pas être négatif)."}] },
+    tot:{ v:124.23, x:"124,23 + 0,00 (≤ ONSS : pas de plafond)" },
+    imp:{ v:2688.66, x:"2.950,00 − 385,57 + 124,23", errs:[{f:"impSansBonus", h:E_OUBLI}] },
+    exp:"Lucas est employé : ONSS = 2.950,00 × 13,07 % = <b>385,57 €</b>. Son brut dépasse juste 2.937,93 € : le volet A devient dégressif, 127,54 − 0,2739 × 12,07 = <b>124,23 €</b>, et le volet B disparaît (<b>0,00 €</b>). Bonus 124,23 €, sous l'ONSS. Imposable : 2.950,00 − 385,57 + 124,23 = <b>2.688,66 €</b>." })
+  ]
+},
+
+/* ================= MISSION 3 ================= */
+{ id:'L3', icon:'👷', title:"L'ONSS et le bonus à l'emploi (2)",
+  desc:"Exercices d, e et f : volet A dégressif pour un ouvrier, puis plus de bonus du tout.",
+  theory:`<p>Le tableau du bonus a <b>trois lignes</b> par volet :</p>
+  <ul><li>sous le premier seuil : le <b>montant plein</b> ;</li>
+  <li>entre les deux seuils : le bonus <b>diminue</b> : montant plein − coefficient × (S − seuil) ;</li>
+  <li>au-delà du dernier seuil : <b>plus de bonus</b> (0 €). Plus de volet B au-delà de 2.937,93 € ; plus de volet A au-delà de 3.403,62 €.</li></ul>
+  <p>Pour un <b>ouvrier</b> : l'ONSS se calcule sur 108 % du brut, mais on lit le tableau du bonus avec le brut à 100 % (S) et on prend la colonne « Ouvriers ».</p>
+  <p><b>Erreur fréquente :</b> oublier d'ajouter le bonus pour obtenir l'imposable (imposable = brut − ONSS + bonus).</p>`,
+  example:`<b>Retour sur la fiche d'Emma Delattre</b> (employée, 2.800,00 € brut) : comment trouve-t-on son bonus de 164,75 € ?<br>
+  ONSS : 2.800,00 × 13,07 % = <b>365,96 €</b>.<br>
+  Volet A : 2.800,00 ≤ 2.937,93 → montant plein : <b>127,54 €</b>.<br>
+  Volet B : 2.800,00 est entre 2.300,62 et 2.937,93 → 171,99 − 0,2699 × (2.800,00 − 2.300,62) = 171,99 − 134,78 = <b>37,21 €</b>.<br>
+  Bonus : 127,54 + 37,21 = <b>164,75 €</b> (≤ ONSS : pas de plafond).<br>
+  Salaire imposable : 2.800,00 − 365,96 + 164,75 = <b>2.598,79 €</b>.`,
+  plus:`Le travailleur qui reçoit le bonus social a aussi droit à une réduction de son précompte : le <b>bonus à l'emploi fiscal</b> (33,14 % du volet A + 63 % du volet B). Tu l'utiliseras dans la partie 2B, consacrée au précompte professionnel.`,
+  questions:[
+  bonusEx({ short:"d) Noah Lejeune — ouvrier", brut:3200,
+    q:"<b>d)</b> Monsieur Noah Lejeune, marié, est ouvrier qualifié dans une entreprise de construction (CP 124). Son salaire mensuel brut est de <b>3.200,00 €</b>. Calcule l'ONSS, le bonus à l'emploi (volets A et B) et le salaire imposable.",
+    data:"Statut : <b>ouvrier</b> · temps plein · salaire mensuel brut : <b>3.200,00 €</b>",
+    base:{ v:3456, x:"3.200,00 × 108 %", errs:[{v:3200, h:"Noah est ouvrier : sa base ONSS n'est pas 100 % du brut."}] },
+    onss:{ v:451.70, x:"3.456,00 × 13,07 % = 451,6992 → 451,70", errs:[{v:418.24, h:"Tu as appliqué 13,07 % au brut. Pour un ouvrier, on l'applique à la base de 108 %."}] },
+    A:{ v:60.22, x:"137,74 − 0,2958 × (3.200,00 − 2.937,93) = 137,74 − 77,52", errs:[
+         {v:137.74, h:"3.200,00 € dépasse 2.937,93 € : utilise la ligne dégressive du volet A."},
+         {v:55.76, h:"Tu as utilisé la formule des employés : Noah est ouvrier (137,74 et 0,2958)."},
+         {v:0, h:"Pour lire le tableau du bonus, S est le brut à 100 % (3.200,00), même pour un ouvrier : 3.200,00 n'a pas encore dépassé 3.403,62."} ] },
+    B:{ v:0, x:"3.200,00 &gt; 2.937,93 → pas de volet B", errs:[{v:185.75, h:"Au-delà de 2.937,93 €, il n'y a plus de volet B."}] },
+    tot:{ v:60.22, x:"60,22 + 0,00 (≤ ONSS : pas de plafond)" },
+    imp:{ v:2808.52, x:"3.200,00 − 451,70 + 60,22", errs:[{f:"impSansBonus", h:E_OUBLI}] },
+    exp:"Noah est ouvrier : base ONSS = 3.200,00 × 108 % = 3.456,00 €, ONSS = <b>451,70 €</b>. On lit le tableau avec 3.200,00 € (100 %), colonne Ouvriers : 3.200,00 est entre 2.937,93 et 3.403,62, donc volet A dégressif : 137,74 − 0,2958 × 262,07 = <b>60,22 €</b>. Pas de volet B. Imposable : 3.200,00 − 451,70 + 60,22 = <b>2.808,52 €</b>. Si on avait lu le tableau avec 3.456,00 €, on aurait oublié à tort tout le bonus." }),
+
+  bonusEx({ short:"e) Chloé Martin — employée", brut:3650,
+    q:"<b>e)</b> Madame Chloé Martin, célibataire, est employée comptable dans une fiduciaire. Son salaire mensuel brut est de <b>3.650,00 €</b>. Calcule l'ONSS, le bonus à l'emploi (volets A et B) et le salaire imposable.",
+    data:"Statut : <b>employée</b> · temps plein · salaire mensuel brut : <b>3.650,00 €</b>",
+    base:{ v:3650, x:"employée : 100 % du brut", errs:[{v:3942, h:"Chloé est employée : sa base ONSS est 100 % du brut."}] },
+    onss:{ v:477.06, x:"3.650,00 × 13,07 % = 477,055 → 477,06" },
+    A:{ v:0, x:"3.650,00 &gt; 3.403,62 → pas de volet A", errs:[{v:127.54, h:"Au-delà de 3.403,62 €, il n'y a plus de volet A."}, {v:-67.50, h:"Au-delà de 3.403,62 €, le volet A vaut 0 (il ne peut pas être négatif)."}] },
+    B:{ v:0, x:"3.650,00 &gt; 2.937,93 → pas de volet B", errs:[{v:171.99, h:"Au-delà de 2.937,93 €, il n'y a plus de volet B."}] },
+    tot:{ v:0, x:"aucun bonus" },
+    imp:{ v:3172.94, x:"3.650,00 − 477,06 + 0,00" },
+    exp:"Chloé est employée : ONSS = 3.650,00 × 13,07 % = <b>477,06 €</b>. Son salaire dépasse 3.403,62 € : <b>aucun bonus</b> (volets A et B à 0). Imposable : 3.650,00 − 477,06 = <b>3.172,94 €</b>." }),
+
+  bonusEx({ short:"f) Yanis Mertens — ouvrier", brut:5500,
+    q:"<b>f)</b> Monsieur Yanis Mertens, marié, est ouvrier chef d'équipe. Son salaire mensuel brut est de <b>5.500,00 €</b>. Calcule l'ONSS, le bonus à l'emploi (volets A et B) et le salaire imposable.",
+    data:"Statut : <b>ouvrier</b> · temps plein · salaire mensuel brut : <b>5.500,00 €</b>",
+    base:{ v:5940, x:"5.500,00 × 108 %", errs:[{v:5500, h:"Yanis est ouvrier : sa base ONSS n'est pas 100 % du brut."}] },
+    onss:{ v:776.36, x:"5.940,00 × 13,07 % = 776,358 → 776,36", errs:[{v:718.85, h:"Tu as appliqué 13,07 % au brut. Pour un ouvrier, on l'applique à la base de 108 %."}] },
+    A:{ v:0, x:"5.500,00 &gt; 3.403,62 → pas de volet A", errs:[{v:137.74, h:"Au-delà de 3.403,62 €, il n'y a plus de volet A."}] },
+    B:{ v:0, x:"5.500,00 &gt; 2.937,93 → pas de volet B", errs:[{v:185.75, h:"Au-delà de 2.937,93 €, il n'y a plus de volet B."}] },
+    tot:{ v:0, x:"aucun bonus" },
+    imp:{ v:4723.64, x:"5.500,00 − 776,36 + 0,00" },
+    exp:"Yanis est ouvrier : base ONSS = 5.500,00 × 108 % = 5.940,00 €, ONSS = <b>776,36 €</b>. Son salaire dépasse largement 3.403,62 € : <b>aucun bonus</b>. Imposable : 5.500,00 − 776,36 = <b>4.723,64 €</b>." })
+  ]
+}
+];
+
+const RANKS = [
+  { p:0,    i:'🎒', n:"Stagiaire paie" },
+  { p:0.20, i:'🧾', n:"Gestionnaire de paie" },
+  { p:0.45, i:'🧮', n:"Calculateur ONSS" },
+  { p:0.65, i:'🏢', n:"Expert sécurité sociale" },
+  { p:0.85, i:'👑', n:"Directeur des ressources humaines" }
+];
+const BADGES = [
+  { id:'first',  i:'🧭', n:"Bon chemin",             c:"Terminer la mission 1", when:'level', l:0 },
+  { id:'all',    i:'🏁', n:"Parcours bouclé",        c:"Terminer les 3 missions", when:'all' },
+  { id:'perfect',i:'💯', n:"Sans faute",             c:"Tout trouver du premier coup dans une mission", when:'perfect' },
+  { id:'streak', i:'🔥', n:"Série de 12",            c:"12 réponses justes d'affilée du premier coup", when:'streak', n:12 },
+  { id:'prec',   i:'🎯', n:"Précision",              c:"Terminer le parcours avec au moins 85 % des XP", when:'prec' },
+  { id:'m108',   i:'🧱', n:"As du 108\u00a0%",       c:"Trouver du premier coup la base et l'ONSS des trois ouvriers", when:'rows',
+    rows:[['1_1','base'],['1_1','onss'],['2_0','base'],['2_0','onss'],['2_2','base'],['2_2','onss']] },
+  { id:'plafond',i:'🧢', n:"Plafond maîtrisé",       c:"Réussir l'exercice a (bonus plafonné) du premier coup", when:'q', qs:['1_0'] },
+  { id:'pred',   i:'🔮', n:"Bonne estimation",       c:"Prédire correctement ton résultat d'une mission", when:'pred' }
+];
+
+
+/* ============================================================
+   MOTEUR COMMUN — applications « Les rémunérations — Partie 2 »
+   ============================================================ */
+
+/* ---------- Calculs de référence (arrondi commercial au cent à chaque étape) ---------- */
+const r2 = x => Math.round((x + (x>=0?1e-9:-1e-9))*100)/100;
+function bareme(x){
+  if(x<=16710) return r2(x*0.2675);
+  if(x<=29500) return r2(4469.93 + r2((x-16710)*0.428));
+  if(x<=51050) return r2(9944.05 + r2((x-29500)*0.4815));
+  return r2(20320.38 + r2((x-51050)*0.535));
+}
+/* Erreur reportée : valeur attendue calculée à partir des montants de l'élève (V) */
+const ECF = {
+  onss:  V => r2(V.base*0.1307),
+  tot:   V => Math.min(r2(V.A+V.B), V.onss),
+  imp:   (V,Q) => r2(Q.brut - V.onss + V.tot),
+  an:    V => r2(V.imp*12),
+  frais: V => V.an>20233.33 ? 6070 : r2(V.an*0.30),
+  netan: V => r2(V.an - V.frais),
+  ib:    V => bareme(V.netan),
+  impan: V => Math.max(0, r2(V.ib - V.quot - V.enf)),
+  mens:  V => r2(V.impan/12),
+  pp:    V => Math.max(0, r2(V.mens - V.autres)),
+  pnet:  V => r2(V.imp - V.pp),
+  impSansBonus: (V,Q) => r2(Q.brut - V.onss),
+  netBrut: (V,Q) => r2(Q.brut - V.pp),
+  m2:    V => r2(V.p2*0.20),
+  m3:    V => r2(V.p3*0.30),
+  m4:    V => r2(V.p4*0.40),
+  m5:    V => r2(V.p5),
+  st:    V => r2(V.m1+V.m2+V.m3+V.m4+V.m5),
+  smax:  V => Math.max(0, r2(V.st - V.enf))
+};
+
+const PRED = [
+  { k:'half', t:"Environ la moitié", e:'😅' },
+  { k:'tq',   t:"Les trois quarts",  e:'💪' },
+  { k:'all',  t:"Tout !",            e:'🏆' }
+];
+
+/* ---------- Totaux dérivés ---------- */
+function prepQuestion(Q){
+  if(Q.type!=='tab') return;
+  Q.inputs = {}; Q.order = [];
+  Q.rows.forEach(row=>row.c.forEach(cell=>{
+    if(cell && typeof cell==='object' && cell.k){ Q.inputs[cell.k] = cell; Q.order.push(cell.k); if(!cell.lbl) cell.lbl = row.c[0]; }
+  }));
+}
+LEVELS.forEach(lv=>lv.questions.forEach(prepQuestion));
+function nEl(Q){ return Q.type==='tab' ? Q.order.length : Q.type==='appar' ? Q.items.length : Q.type==='ordre' ? Q.steps.length : 1; }
+LEVELS.forEach(lv=>{ lv.maxPoints = lv.questions.reduce((s,q)=>s+q.pts,0); });
+const TOTAL_XP = LEVELS.reduce((s,lv)=>s+lv.maxPoints,0);
+const TOTAL_Q  = LEVELS.reduce((s,lv)=>s+lv.questions.length,0);
+const TOTAL_EL = LEVELS.reduce((s,lv)=>s+lv.questions.reduce((t,q)=>t+nEl(q),0),0);
+function qDur(Q){ return Q.type==='tab' ? 30 + 25*nEl(Q) : 60; }
+const TOTAL_DUR = LEVELS.reduce((s,lv)=>s+90+lv.questions.reduce((t,q)=>t+qDur(q),0),0);
+
+/* ============================================================
+   ÉTAT
+   ============================================================ */
+const APP = {
+  screen:'welcome', level:0, q:0,
+  qs:{}, score:0, streak:0, bestStreak:0,
+  lv: LEVELS.map(()=>({ done:false, pred:null, started:false })),
+  badges:new Set(), sound:false, rankIdx:0,
+  email: localStorage.getItem('student_email') || '',
+  classe: localStorage.getItem('student_classe') || '',
+  exerciseStartTime:null, exerciseTimes:{}, exerciseScores:{}, scoreBeforeExercise:0,
+  globalTimerStart:null, globalTimerInterval:null,
+  sent:new Set()
+};
+
+/* ============================================================
+   OUTILS
+   ============================================================ */
+function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
+function fmt(n){
+  if(n===null || n===undefined || isNaN(n)) return '';
+  const neg = n < -0.0049;
+  let [i,d] = Math.abs(n).toFixed(2).split('.');
+  i = i.replace(/\B(?=(\d{3})+(?!\d))/g,'.');
+  return (neg?'−':'')+i+','+d;
+}
+function shuffled(n, seed){
+  const a=[...Array(n).keys()]; let s=seed;
+  for(let i=n-1;i>0;i--){ s=(s*9301+49297)%233280; const j=Math.floor(s/233280*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
+  return a;
+}
+function normToken(t){
+  if(t.includes(',') && t.includes('.')) return t.replace(/\./g,'').replace(',', '.');
+  if(t.includes(',')) return t.replace(/,/g,'.');
+  if(/^\d{1,3}(\.\d{3})+$/.test(t)) return t.replace(/\./g,'');
+  return t;
+}
+function isExpr(s){ return /[+\-*/×÷()%]/.test(String(s).trim().replace(/^[-+−]/,'')); }
+function evalExpr(raw){
+  let e = String(raw).replace(/\s|\u00a0|€/g,'').replace(/×/g,'*').replace(/÷/g,'/').replace(/[−–]/g,'-');
+  if(!e) return null;
+  e = e.replace(/[\d.,]+/g, normToken).replace(/(\d+(?:\.\d+)?)%/g,'($1/100)');
+  if(!/^[0-9+\-*/().]+$/.test(e)) return null;
+  try{ const r = Function('"use strict";return ('+e+')')(); return (typeof r==='number' && isFinite(r)) ? r : null; }
+  catch(err){ return null; }
+}
+function parseNum(raw){
+  if(raw===null || raw===undefined) return null;
+  const s = String(raw).trim().replace(/^−/,'-'); if(!s) return null;
+  if(isExpr(s)){ const v = evalExpr(s); if(v!==null) return v; }
+  const t = normToken(s.replace(/\s|\u00a0|€/g,''));
+  const v = parseFloat(t); return isNaN(v) ? null : v;
+}
+const near = (a,b) => Math.abs(a-b) <= 0.011;           // 1 cent d'écart accepté (corrigé du cours)
+function getQ(l,q){ return LEVELS[l].questions[q]; }
+function key(l,q){ return l+'_'+q; }
+function S(l,q){
+  const k = key(l,q);
+  if(!APP.qs[k]) APP.qs[k] = initQS(getQ(l,q), l, q);
+  return APP.qs[k];
+}
+function initQS(Q,l,q){
+  const seed = l*31 + q*7 + 11;
+  const st = { tries:0, done:false, status:null, earned:0, showHint:false, fb:'', lock:{}, hints:[] };
+  if(Q.type==='appar'){ st.sel={}; st.order=shuffled(Q.options.length, seed); }
+  if(Q.type==='ordre'){ st.slots=Array(Q.steps.length).fill(null); st.pick=null; st.order=shuffled(Q.steps.length+Q.distract.length, seed); }
+  if(Q.type==='tab'){ st.val={}; st.bad={}; }
+  return st;
+}
+function levelUnlocked(l){ return l===0 || APP.lv[l-1].done; }
+function levelPts(l){ return LEVELS[l].questions.reduce((s,_,i)=>s+((APP.qs[key(l,i)]||{}).earned||0),0); }
+function elCounts(l,q){ /* éléments justes du 1er coup / au 2e / montrés */
+  const Q=getQ(l,q), st=APP.qs[key(l,q)], n=nEl(Q), c={ok1:0,ok2:0,ko:0,n};
+  if(!st) return c;
+  Object.values(st.lock).forEach(v=>{ if(c[v]!==undefined) c[v]++; });
+  return c;
+}
+function levelFirst(l){ let a=0,n=0; LEVELS[l].questions.forEach((Q,i)=>{ const c=elCounts(l,i); a+=c.ok1; n+=c.n; }); return n? a/n : 0; }
+function levelCounts(l){
+  const c={correct:0,hint:0,shown:0};
+  LEVELS[l].questions.forEach((_,i)=>{ const st=APP.qs[key(l,i)]; if(st && st.status) c[st.status]++; });
+  return c;
+}
+function starsOf(r){ return r>=0.85?'★★★':r>=0.65?'★★☆':r>=0.45?'★☆☆':'☆☆☆'; }
+function gradeOf(r){ return r>=0.85?{g:'A',t:'Excellent'}:r>=0.65?{g:'B',t:'Très bien'}:r>=0.45?{g:'C',t:'Satisfaisant'}:{g:'D',t:'À retravailler'}; }
+function medalOf(r){ return r>=0.9?'🏆':r>=0.7?'🥇':r>=0.5?'🥈':'🥉'; }
+function rankIndex(score){ let k=0; RANKS.forEach((r,i)=>{ if(score >= Math.ceil(r.p*TOTAL_XP)) k=i; }); return k; }
+
+/* ============================================================
+   MACHINE À ÉTATS
+   ============================================================ */
+function setScreen(name){ APP.screen = name; renderScreen(); try{ window.scrollTo({top:0,behavior:'smooth'}); }catch(e){} }
+function renderScreen(){
+  const m = document.getElementById('main');
+  switch(APP.screen){
+    case 'welcome':  m.innerHTML = renderWelcome(); break;
+    case 'hub':      m.innerHTML = renderHub(); break;
+    case 'brief':    m.innerHTML = renderBrief(APP.level); break;
+    case 'question': m.innerHTML = renderQuestion(APP.level, APP.q); break;
+    case 'bilan':    m.innerHTML = renderBilan(APP.level); break;
+  }
+  updateHUD();
+}
+function goHub(){ if(document.getElementById('emailBox')) return; setScreen('hub'); }
+function firstOpen(l){ const n=LEVELS[l].questions.length; let q=0; while(q<n && S(l,q).done) q++; return Math.min(q,n-1); }
+function openLevel(l){
+  if(!levelUnlocked(l)) return;
+  APP.level = l;
+  if(APP.lv[l].done){ setScreen('bilan'); return; }
+  const st = APP.lv[l];
+  if(!st.started){ st.started = true; startExerciseTimer(l); setScreen('brief'); return; }
+  APP.q = firstOpen(l);
+  setScreen(st.pred ? 'question' : 'brief');
+}
+function startLevel(){ APP.q = firstOpen(APP.level); setScreen('question'); }
+function goQ(q){ const l=APP.level; if(q>0 && !S(l,q-1).done) return; APP.q=q; setScreen('question'); }
+function nextQ(){ const l=APP.level, n=LEVELS[l].questions.length; if(APP.q<n-1){ APP.q++; setScreen('question'); } else completeLevel(l); }
+
+/* ============================================================
+   HUD
+   ============================================================ */
+function updateHUD(){
+  document.getElementById('hXP').textContent = '⭐ '+APP.score+' XP';
+  const sk = document.getElementById('hStreak'); sk.textContent = '🔥 '+APP.streak; sk.classList.toggle('pulse', APP.streak>=5);
+  const ri = rankIndex(APP.score), r = RANKS[ri], nx = RANKS[ri+1];
+  document.getElementById('hRank').textContent = r.i+' '+r.n;
+  document.getElementById('hFill').style.width = Math.min(100, APP.score/TOTAL_XP*100)+'%';
+  document.getElementById('hMarks').innerHTML = RANKS.slice(1).map(k=>{
+    const v = Math.ceil(k.p*TOTAL_XP);
+    return '<span class="xpmark'+(APP.score>=v?' reached':'')+'" style="left:'+(k.p*100)+'%" title="'+k.i+' '+k.n+' : '+v+' XP"></span>';
+  }).join('');
+  document.getElementById('hNext').textContent = nx ? 'prochain rang à '+Math.ceil(nx.p*TOTAL_XP)+' XP' : 'rang maximum atteint';
+  document.getElementById('hDots').innerHTML = LEVELS.map((lv,l)=>{
+    const done = APP.lv[l].done, un = levelUnlocked(l), cur = (APP.screen!=='welcome' && APP.screen!=='hub' && APP.level===l);
+    const cls = 'navdot'+(done?' done':'')+(!un?' locked':'')+(cur?' cur':'');
+    return '<button class="'+cls+'" '+(un?'onclick="openLevel('+l+')"':'disabled')+' aria-label="Mission '+(l+1)+'">'+(done?'✓':(un?(l+1):'🔒'))+'</button>';
+  }).join('');
+  document.getElementById('hSound').textContent = APP.sound ? '🔊' : '🔇';
+}
+
+/* ============================================================
+   ACCUEIL, PARCOURS, BRIEFING
+   ============================================================ */
+function renderWelcome(){
+  return `<div class="card hero">
+    <div class="icon">${APPCFG.logo}</div>
+    <h1>${APPCFG.title}</h1>
+    <div class="sub">${APPCFG.sub}</div>
+    <p>${APPCFG.desc}</p>
+    <div class="counters">
+      <div class="counter"><div class="v">${LEVELS.length}</div><div class="k">mission${LEVELS.length>1?'s':''}</div></div>
+      <div class="counter"><div class="v">${TOTAL_Q}</div><div class="k">exercices</div></div>
+      <div class="counter"><div class="v">${TOTAL_EL}</div><div class="k">montants et réponses</div></div>
+      <div class="counter"><div class="v">${TOTAL_XP}</div><div class="k">XP à gagner</div></div>
+      <div class="counter"><div class="v">≈ ${Math.round(TOTAL_DUR/60)}</div><div class="k">⏱️ minutes</div></div>
+    </div>
+    ${APP.email ? `<div class="who">Connecté(e) : <b>${esc(APP.email)}</b>${APP.classe?' · classe <b>'+esc(APP.classe)+'</b>':''}</div>` : ''}
+    <div class="btn-row" style="justify-content:center;margin-top:18px"><button class="btn btn-primary" onclick="setScreen('hub')">Commencer ➜</button></div>
+    <div class="btn-row" style="justify-content:center;margin-top:12px">
+      <button class="btn btn-sm btn-acc-outline" onclick="openLB('app')">🏆 Classement</button>
+      <button class="btn btn-sm btn-org-outline" onclick="openLB('global')">🌍 Général</button></div>
+  </div>`;
+}
+function renderHub(){
+  const allDone = APP.lv.every(s=>s.done);
+  let h = allDone ? renderFinal() : '';
+  h += `<div class="card"><h2>🗺️ Ton parcours</h2><p class="small muted">${allDone ? "Parcours terminé : clique sur une mission pour revoir son bilan." : "Les missions se débloquent l'une après l'autre. Clique sur la mission dorée pour continuer."}</p><div class="path">`;
+  LEVELS.forEach((lv,l)=>{
+    const st = APP.lv[l], un = levelUnlocked(l), done = st.done, cur = un && !done;
+    const pts = levelPts(l);
+    const meta = done ? `<span class="stars">${starsOf(pts/lv.maxPoints)}</span><span>${pts} / ${lv.maxPoints} XP</span>`
+                      : `<span>${lv.questions.length} exercice${lv.questions.length>1?'s':''}</span><span>${lv.maxPoints} XP à gagner</span>`;
+    h += `<div class="pnode-row ${l%2?'right':'left'}"><div class="pnode${done?' done':cur?' cur':' locked'}">${done?'✓':un?(l+1):'🔒'}</div>
+      <button class="pcard${un?'':' locked'}" ${un?'onclick="openLevel('+l+')"':'disabled'}>
+        <div class="pi">${lv.icon}</div><div class="pt">Mission ${l+1} — ${lv.title}</div><div class="pd">${lv.desc}</div><div class="pm">${meta}</div></button></div>`;
+  });
+  h += `</div></div><div class="card"><h2>🏅 Vitrine à trophées</h2><p class="small muted">${APP.badges.size} / ${BADGES.length} badges obtenus.</p><div class="trophies">`;
+  BADGES.forEach(b=>{ const on = APP.badges.has(b.id);
+    h += `<div class="trophy ${on?'on':'off'}"><div class="ti">${b.i}</div><div><div class="tn">${b.n}</div><div class="tc">${b.c}</div></div></div>`; });
+  return h + `</div></div>`;
+}
+function levelInds(l){ const s=[]; const add=id=>{ if(id && !s.includes(id)) s.push(id); };
+  LEVELS[l].questions.forEach(q=>{ add(q.ind); if(q.inputs) q.order.forEach(k=>add(q.inputs[k].ind)); }); return s; }
+function indById(id){ for(const c of CRITERES) for(const i of c.indicateurs) if(i.id===id) return i; return null; }
+function refButtons(){ return `<div class="toolbar">${APPCFG.refs.map(r=>`<button class="btn btn-sm btn-ghost" onclick="openRef('${r}')">${REFS[r].btn}</button>`).join('')}</div>`; }
+function renderBrief(l){
+  const lv = LEVELS[l], st = APP.lv[l];
+  const goals = levelInds(l).map(id=>'<li>'+indById(id).obj+' ;</li>').join('').replace(/ ;<\/li>$/,'.</li>');
+  return `<div class="card">
+    <div class="brief-h"><div class="bi">${lv.icon}</div><div><h2>Mission ${l+1} — ${lv.title}</h2>
+      <div class="bm">${lv.questions.length} exercice${lv.questions.length>1?'s':''} · ${lv.maxPoints} XP en jeu</div></div></div>
+    <div class="goals"><h3>🎯 À la fin de cette mission, tu sauras :</h3><ul>${goals}</ul></div>
+    <div class="theo"><h3>📘 Rappel</h3>${lv.theory}</div>
+    ${refButtons()}
+    <div class="exbox"><h3>🧪 Exemple du cours</h3>${lv.example}</div>
+    ${lv.plus?`<details class="plus"><summary>🌟 Pour aller plus loin (non évalué)</summary><p>${lv.plus}</p></details>`:''}
+    <div class="pred"><h3>🔮 Quelle part des montants penses-tu trouver du premier coup ?</h3>
+      <div class="btn-row">${PRED.map(p=>`<button class="btn btn-sm${st.pred===p.k?' on':''}" onclick="setPred('${p.k}')">${p.t} ${p.e}</button>`).join('')}</div></div>
+    <div class="btn-row" style="justify-content:space-between;margin-top:14px">
+      <button class="btn btn-ghost" onclick="setScreen('hub')">← Parcours</button>
+      <button class="btn btn-primary" onclick="startLevel()" ${st.pred?'':'disabled'}>C'est parti ➜</button></div></div>`;
+}
+function setPred(k){ APP.lv[APP.level].pred = k; renderScreen(); }
+
+/* ============================================================
+   ÉCRAN QUESTION
+   ============================================================ */
+const TAGS = { appar:"Appariement — 2 essais", ordre:"Remise en ordre — 2 essais", tab:"Tableau à compléter — 2 essais" };
+function renderQuestion(l,q){
+  const lv = LEVELS[l], Q = getQ(l,q), st = S(l,q), n = lv.questions.length;
+  let dots = '';
+  for(let i=0;i<n;i++){
+    const s = APP.qs[key(l,i)], cls = 'qdot '+(i===q?'cur':(s&&s.status?s.status:''));
+    dots += (i===0 || S(l,i-1).done) ? `<button class="${cls}" onclick="goQ(${i})" aria-label="Exercice ${i+1}"></button>` : `<span class="${cls}"></span>`;
+  }
+  let h = `<div class="qtop"><button class="btn btn-sm btn-ghost" onclick="setScreen('hub')">← Parcours</button>
+    <button class="btn btn-sm btn-ghost" onclick="setScreen('brief')">📘 Rappel</button>
+    <span class="qm">${lv.icon} Mission ${l+1} — exercice ${q+1} / ${n}</span><div class="qdots">${dots}</div></div>`;
+  h += `<div class="card" id="qcard"><div class="qtag">${TAGS[Q.type]} · ${Q.pts} XP</div><div class="qtext">${Q.q}</div>`;
+  if(Q.data) h += `<span class="data">${Q.data}</span>`;
+  if(Q.type==='tab') h += refButtons();
+  h += Q.type==='appar' ? rAppar(Q,st) : Q.type==='ordre' ? rOrdre(Q,st) : rTab(Q,st);
+  h += `<div id="fbHost">${fbHTML(Q,st)}</div></div>`;
+  if(st.done) h += `<div class="qnav"><button class="btn btn-primary" onclick="nextQ()">${q<n-1?'Exercice suivant ➜':'Terminer la mission ➜'}</button></div>`;
+  return h;
+}
+function fbHTML(Q,st){
+  let h = st.fb || '';
+  if(!st.done && st.showHint){
+    if(st.hints.length) h += `<div class="fb fb-hint"><h4>💡 Pistes pour les montants à corriger</h4><ul>${st.hints.map(x=>`<li><span class="loc">${x.loc}</span> ${x.h}</li>`).join('')}</ul></div>`;
+    else if(Q.hint) h += `<div class="fb fb-hint"><h4>💡 Indice</h4><p>${Q.hint}</p></div>`;
+  }
+  if(st.done){
+    const v = st.status==='correct' ? ['fb-ok','✅ Tout juste du premier coup — +'+st.earned+' XP']
+            : st.status==='hint' ? ['fb-mid','🔄 Tout est juste après le 2e essai — +'+st.earned+' XP']
+            : ['fb-bad','👁 Les montants corrects sont affichés en rouge'+(st.earned?' — +'+st.earned+' XP':'')];
+    h += `<div class="fb ${v[0]}"><h4>${v[1]}</h4><p>${Q.exp}</p></div>`;
+  }
+  return h;
+}
+
+/* ---------- Barème commun des questions « à éléments » ---------- */
+function countLocks(st){ let a=0,b=0; Object.values(st.lock).forEach(v=>{ if(v==='ok1')a++; else if(v==='ok2')b++; }); return [a,b]; }
+function itemFinish(l,q,ev){
+  const Q=getQ(l,q), st=S(l,q), n=nEl(Q), [a,b]=countLocks(st);
+  const earned = Math.round(Q.pts*(a+0.5*b)/n);
+  const status = a===n ? 'correct' : (a+b===n ? 'hint' : 'shown');
+  finishQ(l,q,status,earned,ev);
+}
+/* Série : nombre de réponses justes d'affilée du premier coup (chaque montant compte) */
+function streakAfterFirst(okList){
+  if(okList.every(x=>x)){ APP.streak += okList.length; }
+  else { let t=0; for(let i=okList.length-1;i>=0 && okList[i];i--) t++; APP.streak = t; }
+  APP.bestStreak = Math.max(APP.bestStreak, APP.streak);
+}
+function firstFailFb(st,n){
+  const ok = Object.keys(st.lock).length;
+  st.fb = `<div class="fb fb-bad"><h4>🔒 ${ok} réponse${ok>1?'s':''} sur ${n} ${ok>1?'sont':'est'} juste${ok>1?'s':''}</h4><p>Ce qui est juste est verrouillé en vert. Corrige ce qui est encadré en rouge, puis vérifie une dernière fois.</p></div>`;
+}
+
+/* ---------- APPARIEMENT ---------- */
+function rAppar(Q,st){
+  let h = '<div class="appar">';
+  Q.items.forEach((it,i)=>{
+    const lk = st.lock[i];
+    let sel = `<select ${lk||st.done?'disabled':''} onchange="setAppar(${i},this.value)" aria-label="${esc(it.t)}"><option value="">— Choisis —</option>`;
+    st.order.forEach(k=>{ const o=Q.options[k]; sel += `<option value="${o.k}" ${st.sel[i]===o.k?'selected':''}>${esc(o.t)}</option>`; });
+    const good = Q.options.find(o=>o.k===it.a);
+    h += `<div class="arow${lk?' '+lk:''}"><div class="at">${it.t}</div>${sel}</select>${lk==='ko'?`<div class="fix">✏️ correction : ${good.t}</div>`:''}</div>`;
+  });
+  h += '</div>';
+  if(!st.done) h += `<div class="btn-row end" style="margin-top:12px"><button class="btn btn-primary" onclick="checkAppar(event)" ${Q.items.every((_,i)=>st.sel[i])?'':'disabled'}>Vérifier (${st.tries+1}/2)</button></div>`;
+  return h;
+}
+function setAppar(i,v){ S(APP.level,APP.q).sel[i]=v; renderScreen(); }
+function checkAppar(ev){
+  const l=APP.level, q=APP.q, Q=getQ(l,q), st=S(l,q), n=Q.items.length; if(st.done) return;
+  st.tries++; const okList=[];
+  Q.items.forEach((it,i)=>{
+    if(st.lock[i]) return;
+    const ok = st.sel[i]===it.a; okList.push(ok);
+    if(ok) st.lock[i] = st.tries===1 ? 'ok1' : 'ok2';
+    else if(st.tries===1) st.sel[i]=''; else st.lock[i]='ko';
+  });
+  if(st.tries===1) streakAfterFirst(okList);
+  const [a] = countLocks(st);
+  if(a===n || st.tries>=2){ st.fb=''; itemFinish(l,q,ev); return; }
+  firstFailFb(st,n); st.showHint=true; failFirst();
+}
+
+/* ---------- REMISE EN ORDRE ---------- */
+function ordreLabel(Q,k){ return k<Q.steps.length ? Q.steps[k] : Q.distract[k-Q.steps.length]; }
+function rOrdre(Q,st){
+  const placed = st.slots.filter(x=>x!==null);
+  let h = '<div class="bank-l">Étiquettes disponibles — clique une étiquette, puis l\'emplacement où la placer :</div><div class="bank">';
+  st.order.forEach(k=>{ if(placed.includes(k)) return;
+    h += `<button class="chip${st.pick===k?' pick':''}" ${st.done?'disabled':''} onclick="pickOrdre(${k})">${ordreLabel(Q,k)}</button>`; });
+  h += '</div><div class="slots">';
+  st.slots.forEach((k,i)=>{
+    const lk = st.lock[i];
+    let inner = '<span class="ph">emplacement vide</span>';
+    if(k!==null) inner = `<span class="chip ${lk||''}">${ordreLabel(Q,k)}${lk==='ko'?`<span class="fix">→ ${Q.steps[i]}</span>`:''}</span>`;
+    else if(lk==='ko') inner = `<span class="chip ko">—<span class="fix">→ ${Q.steps[i]}</span></span>`;
+    h += `<button class="slot${st.pick!==null && !lk?' target':''}" ${lk||st.done?'disabled':''} onclick="slotOrdre(${i})"><span class="sn">${i+1}</span>${inner}</button>`;
+  });
+  h += '</div>';
+  if(!st.done) h += `<div class="btn-row end" style="margin-top:12px"><button class="btn btn-primary" onclick="checkOrdre(event)" ${st.slots.every(x=>x!==null)?'':'disabled'}>Vérifier (${st.tries+1}/2)</button></div>`;
+  return h;
+}
+function pickOrdre(k){ const st=S(APP.level,APP.q); st.pick = st.pick===k ? null : k; renderScreen(); }
+function slotOrdre(i){
+  const st=S(APP.level,APP.q); if(st.lock[i]) return;
+  if(st.pick!==null){ st.slots[i]=st.pick; st.pick=null; }
+  else if(st.slots[i]!==null){ st.pick=st.slots[i]; st.slots[i]=null; }
+  renderScreen();
+}
+function checkOrdre(ev){
+  const l=APP.level, q=APP.q, Q=getQ(l,q), st=S(l,q), n=Q.steps.length;
+  if(st.done || st.slots.some(x=>x===null)) return;
+  st.tries++; st.pick=null; const okList=[];
+  st.slots.forEach((k,i)=>{
+    if(st.lock[i]) return;
+    const ok = k===i; okList.push(ok);
+    if(ok) st.lock[i] = st.tries===1 ? 'ok1' : 'ok2';
+    else if(st.tries===1) st.slots[i]=null; else st.lock[i]='ko';
+  });
+  if(st.tries===1) streakAfterFirst(okList);
+  const [a] = countLocks(st);
+  if(a===n || st.tries>=2){ st.fb=''; itemFinish(l,q,ev); return; }
+  firstFailFb(st,n); st.showHint=true; failFirst();
+}
+
+/* ---------- TABLEAU À COMPLÉTER ---------- */
+function rTab(Q,st){
+  const hasCalc = Q.head.includes('Calcul');
+  let h = `<div class="tabwrap"><table class="tab"><thead><tr>${Q.head.map((x,i)=>`<th${i===Q.head.length-1||x.startsWith('Montant')?' class="r"':''}>${x}</th>`).join('')}</tr></thead><tbody>`;
+  Q.rows.forEach(row=>{
+    h += `<tr class="${row.b?'bold':''}">`;
+    row.c.forEach((cell,ci)=>{
+      const dl = esc(Q.head[ci]||'');
+      if(typeof cell==='string'){ h += `<td data-l="${dl}"${ci===0?' class="nol"':(cell.match(/%$/)?' class="ctr"':'')}>${cell}</td>`; return; }
+      if(cell.g!==undefined){ h += `<td class="given" data-l="${dl}">${cell.g}</td>`; return; }
+      if(!cell.k && cell.x!==undefined){ /* colonne « Calcul » liée à un montant */
+        const inp = Q.inputs[cell.x], lk = st.lock[cell.x];
+        const show = st.done || ((lk==='ok1' || lk==='ok2') && !(st.ecf && st.ecf[cell.x]));
+        h += `<td class="calc" data-l="${dl}">${show ? inp.x : (cell.blank?'':'<span class="hid">🔒 visible après correction</span>')}</td>`; return;
+      }
+      const k = cell.k, lk = st.lock[k], v = st.val[k]||'';
+      const cls = lk ? lk : (st.bad[k] ? 'bad' : '');
+      const dis = (lk || st.done) ? 'disabled' : '';
+      const showX = !hasCalc && (st.done || ((lk==='ok1' || lk==='ok2') && !(st.ecf && st.ecf[k])));
+      h += `<td class="cin ${cls}" data-l="${dl}"><input class="tin" inputmode="decimal" autocomplete="off" placeholder="0,00" value="${esc(v)}" ${dis}
+          oninput="onTab('${k}',this)" onkeydown="if(event.key==='Enter')checkTab(event)" aria-label="${esc(cell.lbl)}">
+          <span class="calc-hint" id="th-${k}">${amtHint(v)}</span>
+          ${lk==='ko'?`<span class="fix">→ ${fmt(cell.v)}</span>`:''}${st.done && st.ecf && st.ecf[k]?`<span class="ecfnote">↳ juste avec tes montants (erreur reportée) ; avec les bons montants : ${fmt(cell.v)}</span>`:''}${showX?`<span class="xex">${cell.x}</span>`:''}</td>`;
+    });
+    h += '</tr>';
+  });
+  h += '</tbody></table></div>';
+  if(!st.done) h += `<p class="tiny muted" style="margin-top:6px">Tu peux taper ton calcul directement dans la case (ex. 1500*13,07%) : le résultat s'affiche dessous. Arrondis au cent à chaque étape ; 1 cent d'écart est accepté.</p>
+    <div class="btn-row end" style="margin-top:10px"><button class="btn btn-primary" onclick="checkTab(event)">Vérifier (${st.tries+1}/2)</button></div>`;
+  return h;
+}
+function amtHint(v){ if(!v || !isExpr(v)) return ''; const r = evalExpr(v); return r===null ? '' : '= '+fmt(r); }
+function onTab(k,el){ const st=S(APP.level,APP.q); st.val[k]=el.value; const hEl=document.getElementById('th-'+k); if(hEl) hEl.textContent = amtHint(el.value); }
+function tabValues(Q,st){
+  const V = {};
+  Q.order.forEach(k=>{ const inp=Q.inputs[k]; let x=parseNum(st.val[k]); if(x===null) x=inp.v; if(inp.abs) x=Math.abs(x); V[k]=x; });
+  return V;
+}
+function tabMatch(Q,inp,x,V){
+  if(inp.abs) x = Math.abs(x);
+  if(near(x,inp.v)) return true;
+  if(inp.alt && inp.alt.some(a=>near(x,a))) return true;
+  if(inp.f && ECF[inp.f]){ const e = ECF[inp.f](V,Q); if(near(x,e)) return true; }
+  return false;
+}
+function checkTab(ev){
+  const l=APP.level, q=APP.q, Q=getQ(l,q), st=S(l,q), n=Q.order.length;
+  if(st.done) return;
+  const missing = Q.order.filter(k=>!st.lock[k] && parseNum(st.val[k])===null);
+  if(missing.length){
+    st.fb = `<div class="fb fb-hint"><h4>✏️ Tableau incomplet</h4><p>Complète toutes les cases (écris <b>0</b> quand il n'y a rien) avant de vérifier. Aucun essai n'est compté.</p></div>`;
+    renderScreen(); return;
+  }
+  st.tries++; st.hints=[]; st.bad={}; st.ecf = st.ecf || {};
+  const V = tabValues(Q,st), okList=[];
+  Q.order.forEach(k=>{
+    if(st.lock[k]) return;
+    const inp = Q.inputs[k], x = parseNum(st.val[k]);
+    const ok = tabMatch(Q,inp,x,V); okList.push(ok);
+    if(ok){
+      st.lock[k] = st.tries===1 ? 'ok1' : 'ok2';
+      const xa = inp.abs ? Math.abs(x) : x;
+      if(!near(xa,inp.v) && !(inp.alt && inp.alt.some(a=>near(xa,a)))) (st.ecf = st.ecf || {})[k] = true;
+      return;
+    }
+    if(st.tries===1){
+      st.bad[k] = true;
+      const xx = inp.abs ? Math.abs(x) : x;
+      const spec = (inp.errs||[]).find(e=> e.f ? (ECF[e.f] && near(xx, ECF[e.f](V,Q)) && (!e.cond || e.cond(V,Q))) : near(xx,e.v));
+      st.hints.push({ loc:inp.lbl.replace(/<[^>]+>/g,''), h: spec ? spec.h : inp.h });
+    } else st.lock[k] = 'ko';
+  });
+  if(st.tries===1) streakAfterFirst(okList);
+  const [a] = countLocks(st);
+  if(a===n || st.tries>=2){ st.fb=''; itemFinish(l,q,ev); return; }
+  firstFailFb(st,n); st.showHint=true; failFirst();
+}
+
+/* ============================================================
+   TABLEAUX DE RÉFÉRENCE (modales)
+   ============================================================ */
+function closeModal(){ document.getElementById('modalHost').innerHTML=''; }
+function openRef(kind){
+  const R = REFS[kind];
+  document.getElementById('modalHost').innerHTML = `<div class="modal" onclick="if(event.target===this)closeModal()"><div class="modal-box" style="max-width:720px">
+    <div class="modal-h"><h3>${R.title}</h3><button class="close-x" onclick="closeModal()" aria-label="Fermer">×</button></div>
+    <div class="modal-b">${R.html}</div>
+    <div class="modal-f"><button class="btn btn-ghost" onclick="closeModal()">Fermer</button></div></div></div>`;
+}
+const REFS = {
+  bonus: { btn:"📊 ONSS et bonus à l'emploi", title:"📊 ONSS et bonus à l'emploi (montants au 1er septembre 2026)", html:`
+    <div class="refsec">La retenue ONSS (cotisations personnelles) : 13,07 %</div>
+    <table class="reftable"><thead><tr><th>Statut</th><th>Calcul de l'ONSS</th></tr></thead><tbody>
+    <tr><td>Employé</td><td>salaire brut × 13,07 %</td></tr>
+    <tr><td>Ouvrier</td><td>(salaire brut × 108 %) × 13,07 %</td></tr></tbody></table>
+    <div class="refsec">Volet A — bas salaires</div>
+    <div class="scroll"><table class="reftable"><thead><tr><th>Salaire mensuel brut (S)</th><th class="r">Employés (€)</th><th class="r">Ouvriers (€)</th></tr></thead><tbody>
+    <tr><td>S ≤ 2.937,93 €</td><td class="r">127,54</td><td class="r">137,74</td></tr>
+    <tr><td>2.937,93 € &lt; S ≤ 3.403,62 €</td><td class="r">127,54 − 0,2739 × (S − 2.937,93)</td><td class="r">137,74 − 0,2958 × (S − 2.937,93)</td></tr>
+    <tr><td>S &gt; 3.403,62 €</td><td class="r">0</td><td class="r">0</td></tr></tbody></table></div>
+    <div class="refsec">Volet B — très bas salaires</div>
+    <div class="scroll"><table class="reftable"><thead><tr><th>Salaire mensuel brut (S)</th><th class="r">Employés (€)</th><th class="r">Ouvriers (€)</th></tr></thead><tbody>
+    <tr><td>S ≤ 2.300,62 €</td><td class="r">171,99</td><td class="r">185,75</td></tr>
+    <tr><td>2.300,62 € &lt; S ≤ 2.937,93 €</td><td class="r">171,99 − 0,2699 × (S − 2.300,62)</td><td class="r">185,75 − 0,2915 × (S − 2.300,62)</td></tr>
+    <tr><td>S &gt; 2.937,93 €</td><td class="r">0</td><td class="r">0</td></tr></tbody></table></div>
+    <div class="refnote"><b>Les 3 règles à connaître</b><br>① S = salaire brut à 100 %, même pour un ouvrier : on lit simplement la colonne « Ouvriers ».<br>② Bonus total = volet A + volet B.<br>③ Le bonus ne peut jamais dépasser l'ONSS personnelle. Si A + B est plus grand que l'ONSS, on réduit le volet B : volet B retenu = ONSS − volet A.</div>
+    <div class="refnote"><b>Méthode</b> — ① Calculer l'ONSS (13,07 % ; sur 108 % pour un ouvrier). ② Situer le salaire brut dans le tableau du volet A, puis dans celui du volet B. ③ Additionner A + B et vérifier que le total ne dépasse pas l'ONSS. ④ Salaire imposable = brut − ONSS + bonus à l'emploi.</div>
+    <div class="refnote"><b>Bonus à l'emploi fiscal</b> (réduction du précompte) : 33,14 % du volet A + 63 % du volet B (depuis le 1er août 2026).</div>` },
+  fk: { btn:"🧮 Formule-clé du précompte", title:"🧮 Formule-clé du précompte professionnel (montants 2026)", html:`
+    <div class="refsec">Étape 0 — Salaire imposable mensuel</div>
+    <div class="refnote">Salaire imposable = salaire brut − cotisations ONSS + bonus à l'emploi social. Pas de bonus si le brut dépasse 3.403,62 €.</div>
+    <div class="refsec">Étape 1 — Revenu annuel brut</div>
+    <div class="refnote">Revenu annuel brut = salaire imposable mensuel × 12</div>
+    <div class="refsec">Étape 2 — Frais professionnels forfaitaires</div>
+    <table class="reftable"><thead><tr><th>Revenu annuel brut</th><th>Frais professionnels forfaitaires</th></tr></thead><tbody>
+    <tr><td>jusqu'à 20.233,33 €</td><td>30 % du revenu annuel brut</td></tr>
+    <tr><td>plus de 20.233,33 €</td><td>6.070,00 € (maximum)</td></tr></tbody></table>
+    <div class="refnote">Revenu annuel net imposable = revenu annuel brut − frais forfaitaires</div>
+    <div class="refsec">Étape 3 — Impôt annuel</div>
+    <div class="scroll"><table class="reftable"><thead><tr><th>Revenu annuel net imposable</th><th>Impôt de base</th></tr></thead><tbody>
+    <tr><td>de 0,01 € à 16.710,00 €</td><td>26,75 % du revenu</td></tr>
+    <tr><td>de 16.710,01 € à 29.500,00 €</td><td>4.469,93 € + 42,80 % de la partie au-delà de 16.710,00 €</td></tr>
+    <tr><td>de 29.500,01 € à 51.050,00 €</td><td>9.944,05 € + 48,15 % de la partie au-delà de 29.500,00 €</td></tr>
+    <tr><td>plus de 51.050,00 €</td><td>20.320,38 € + 53,50 % de la partie au-delà de 51.050,00 €</td></tr></tbody></table></div>
+    <div class="refnote">− Réduction pour la <b>quotité exemptée</b> : <b>2.987,98 €</b> par an (= 11.170,00 € × 26,75 %).</div>
+    <table class="reftable"><thead><tr><th>Enfants à charge</th><th class="r">Réduction annuelle</th></tr></thead><tbody>
+    <tr><td>1</td><td class="r">624,00 €</td></tr><tr><td>2</td><td class="r">1.656,00 €</td></tr><tr><td>3</td><td class="r">4.404,00 €</td></tr><tr><td>4</td><td class="r">7.620,00 €</td></tr></tbody></table>
+    <div class="refnote">Un enfant handicapé compte pour deux. Impôt annuel = impôt de base − quotité exemptée − réduction pour enfants.</div>
+    <div class="refsec">Étapes 4 et 5 — Précompte mensuel</div>
+    <div class="refnote">Précompte mensuel = impôt annuel ÷ 12. On retire ensuite les autres réductions : <b>bonus à l'emploi fiscal</b> (33,14 % du volet A + 63 % du volet B), heures supplémentaires, assurance-groupe… Le précompte ne peut jamais être négatif.<br><b>Salaire net (avant CSS)</b> = salaire imposable − précompte professionnel.</div>
+    <div class="refnote"><b>À savoir :</b> le barème contient déjà une majoration de 7 % pour les taxes communales (26,75 % au lieu de 25 %). On arrondit au cent à chaque étape.</div>` },
+  saisie: { btn:"⚖️ Saisies et cessions", title:"⚖️ Montants saisissables ou cessibles (à partir du 1er janvier 2026)", html:`
+    <div class="scroll"><table class="reftable"><thead><tr><th>Salaire net mensuel</th><th class="r">Partie saisissable ou cessible</th><th class="r">Maximum de la tranche</th></tr></thead><tbody>
+    <tr><td>jusqu'à 1.419,00 €</td><td class="r">0 %</td><td class="r">0,00 €</td></tr>
+    <tr><td>de 1.419,01 € à 1.524,00 €</td><td class="r">20 %</td><td class="r">21,00 €</td></tr>
+    <tr><td>de 1.524,01 € à 1.682,00 €</td><td class="r">30 %</td><td class="r">47,40 €</td></tr>
+    <tr><td>de 1.682,01 € à 1.839,00 €</td><td class="r">40 %</td><td class="r">62,80 €</td></tr>
+    <tr><td>plus de 1.839,00 €</td><td class="r">100 %</td><td class="r">tout ce qui dépasse</td></tr></tbody></table></div>
+    <div class="refnote"><b>Largeur des tranches :</b> 1.524 − 1.419 = 105,00 € · 1.682 − 1.524 = 158,00 € · 1.839 − 1.682 = 157,00 €.</div>
+    <div class="refnote"><b>Enfant à charge :</b> le montant saisissable ou cessible obtenu est diminué de <b>88 € par enfant à charge</b> (montant 2026). Le résultat ne peut pas être négatif.<br>Exception : pour une dette de pension alimentaire, ces limites ne s'appliquent pas.</div>
+    <div class="refnote"><b>Méthode</b> — ① Je découpe le salaire net en tranches. ② J'applique le pourcentage de chaque tranche. ③ J'additionne les montants obtenus. ④ Je retire 88 € par enfant à charge (minimum 0 €).</div>` }
+};
+
+/* ============================================================
+   SCORE, SÉRIE, EFFETS
+   ============================================================ */
+function finishQ(l,q,status,earned,ev){
+  const st = S(l,q);
+  st.done = true; st.status = status; st.earned = earned; st.showHint = false;
+  APP.score += earned;
+  if(status!=='shown') sfx('ok');
+  if(status==='correct' && APP.streak>=3) comboFlash(APP.streak);
+  if(earned>0) burst(ev, earned);
+  checkBadges();
+  renderScreen(); checkRank();
+}
+function failFirst(){
+  sfx('ko'); renderScreen();
+  const c = document.getElementById('qcard'); if(c){ c.classList.remove('shake'); void c.offsetWidth; c.classList.add('shake'); }
+}
+function evPoint(ev){
+  if(ev && ev.clientX) return {x:ev.clientX, y:ev.clientY};
+  const t = ev && ev.target && ev.target.getBoundingClientRect ? ev.target.getBoundingClientRect() : null;
+  if(t && t.width) return {x:t.left+t.width/2, y:t.top+t.height/2};
+  return {x:window.innerWidth/2, y:window.innerHeight/2};
+}
+function burst(ev, pts){
+  const p = evPoint(ev), cols = ['#3ae08c','#ffd166','#ff9f43','#4aa8ff','#a78bfa'];
+  for(let i=0;i<16;i++){
+    const d = document.createElement('div'); d.className='particle';
+    const a = Math.PI*2*i/16, r = 50+Math.random()*50;
+    d.style.left=p.x+'px'; d.style.top=p.y+'px'; d.style.background=cols[i%cols.length];
+    d.style.setProperty('--dx',Math.cos(a)*r+'px'); d.style.setProperty('--dy',Math.sin(a)*r+'px');
+    document.body.appendChild(d); setTimeout(()=>d.remove(),900);
+  }
+  const f = document.createElement('div'); f.className='floatxp'; f.textContent='+'+pts+' XP';
+  f.style.left=(p.x-24)+'px'; f.style.top=(p.y-30)+'px'; document.body.appendChild(f); setTimeout(()=>f.remove(),1200);
+}
+function comboFlash(n){
+  const t = n>=15 ? '⚡ INARRÊTABLE ×'+n : n>=8 ? '🔥 EN FEU ×'+n : '🔥 COMBO ×'+n;
+  const d = document.createElement('div'); d.className='combo'; d.textContent=t; document.body.appendChild(d); setTimeout(()=>d.remove(),1200);
+}
+function confetti(){
+  const cols=['#3ae08c','#ffd166','#ff9f43','#4aa8ff','#a78bfa','#ff5f6d'];
+  for(let i=0;i<90;i++){ const c=document.createElement('div'); c.className='confetti';
+    c.style.left=Math.random()*100+'vw'; c.style.background=cols[i%cols.length];
+    c.style.animationDuration=(2.2+Math.random()*2)+'s'; c.style.animationDelay=(Math.random()*.6)+'s';
+    document.body.appendChild(c); setTimeout(()=>c.remove(),5200); }
+}
+const FX = { queue:[], busy:false };
+function pushFx(fn){ FX.queue.push(fn); if(!FX.busy) nextFx(); }
+function nextFx(){ const fn=FX.queue.shift(); if(!fn){ FX.busy=false; return; } FX.busy=true; fn(); }
+function checkRank(){
+  const ri = rankIndex(APP.score);
+  if(ri > APP.rankIdx){
+    APP.rankIdx = ri; const r = RANKS[ri];
+    pushFx(()=>{ sfx('rank');
+      const d=document.createElement('div'); d.className='rankup'; d.id='rankup';
+      d.innerHTML=`<div class="rays"></div><div class="rcard"><div class="ri">${r.i}</div><div class="rt">MONTÉE EN GRADE</div><div class="rn">${r.n}</div><p class="small muted" style="margin-bottom:14px">Tu as atteint ${Math.ceil(r.p*TOTAL_XP)} XP. Continue comme ça !</p><button class="btn btn-gold" onclick="closeRank()">Continuer ➜</button></div>`;
+      document.body.appendChild(d); confetti(); });
+  }
+}
+function closeRank(){ const d=document.getElementById('rankup'); if(d) d.remove(); nextFx(); }
+const TOASTS = { queue:[], busy:false };
+function award(id){
+  if(APP.badges.has(id)) return; APP.badges.add(id);
+  TOASTS.queue.push(BADGES.find(x=>x.id===id)); if(!TOASTS.busy) nextToast();
+}
+function nextToast(){
+  const b=TOASTS.queue.shift(); if(!b){ TOASTS.busy=false; return; }
+  TOASTS.busy=true; sfx('badge');
+  const t=document.createElement('div'); t.className='toast';
+  t.innerHTML=`<div class="ti">${b.i}</div><div><div class="tt">BADGE DÉBLOQUÉ</div><div class="tn">${b.n}</div></div>`;
+  document.getElementById('toastHost').appendChild(t); setTimeout(()=>{ t.remove(); nextToast(); },3000);
+}
+function predOf(l){ const r=levelFirst(l); return r===1 ? 'all' : (r>=0.625 ? 'tq' : 'half'); }
+function badgeOk(b){
+  switch(b.when){
+    case 'level':   return APP.lv[b.l].done;
+    case 'all':     return APP.lv.every(s=>s.done);
+    case 'perfect': return APP.lv.some((s,l)=>s.done && levelFirst(l)===1);
+    case 'streak':  return APP.bestStreak>=b.n;
+    case 'prec':    return APP.lv.every(s=>s.done) && APP.score>=0.85*TOTAL_XP;
+    case 'pred':    return APP.lv.some((s,l)=>s.done && s.pred && s.pred===predOf(l));
+    case 'q':       return b.qs.every(k=>APP.qs[k] && APP.qs[k].status==='correct');
+    case 'rows':    return b.rows.every(([k,ik])=>APP.qs[k] && APP.qs[k].done && APP.qs[k].lock[ik]==='ok1');
+  }
+  return false;
+}
+function checkBadges(){ BADGES.forEach(b=>{ if(!APP.badges.has(b.id) && badgeOk(b)) award(b.id); }); }
+let AC = null;
+function toggleSound(){ APP.sound=!APP.sound; if(APP.sound && !AC){ try{ AC=new (window.AudioContext||window.webkitAudioContext)(); }catch(e){ AC=null; } } updateHUD(); }
+function tone(freq,start,dur,type,vol){
+  if(!AC) return; const o=AC.createOscillator(), g=AC.createGain(), t=AC.currentTime+start;
+  o.type=type||'sine'; o.frequency.value=freq;
+  g.gain.setValueAtTime(0.0001,t); g.gain.exponentialRampToValueAtTime(vol||0.15,t+0.02); g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+  o.connect(g); g.connect(AC.destination); o.start(t); o.stop(t+dur+0.05);
+}
+function sfx(k){
+  if(!APP.sound || !AC) return;
+  if(k==='ok'){ tone(660,0,.12); tone(990,.1,.18); }
+  else if(k==='ko'){ tone(220,0,.22,'triangle',.12); }
+  else if(k==='badge'){ tone(784,0,.12); tone(988,.1,.12); tone(1319,.2,.25); }
+  else { [523,659,784,1047].forEach((f,i)=>tone(f,i*.11,.22)); }
+}
+
+/* ============================================================
+   FIN DE MISSION ET BILANS
+   ============================================================ */
+function completeLevel(l){
+  const st = APP.lv[l];
+  if(!st.done){
+    st.done = true;
+    const res = stopExerciseTimer(l);
+    if(!APP.sent.has(l)){ APP.sent.add(l);
+      sendResult('Mission '+(l+1)+' — '+LEVELS[l].title, res ? res.points : levelPts(l), LEVELS[l].maxPoints, res ? res.temps : 0); }
+    checkBadges(); sfx('level');
+    if(levelFirst(l) >= 0.7) confetti();
+  }
+  APP.level = l; setScreen('bilan');
+}
+function renderBilan(l){
+  const lv = LEVELS[l], pts = levelPts(l), r1 = levelFirst(l), gr = gradeOf(r1), st = APP.lv[l];
+  let a1=0,a2=0,ak=0,an=0;
+  let rows = '';
+  lv.questions.forEach((Q,i)=>{
+    const s = S(l,i), c = elCounts(l,i); a1+=c.ok1; a2+=c.ok2; ak+=c.ko; an+=c.n;
+    const ic = s.status==='correct'?'✅':s.status==='hint'?'🔄':s.status==='shown'?'👁':'—';
+    rows += `<tr><td>${i+1}. ${Q.short||TAGS[Q.type].split(' — ')[0]}</td><td class="c">${ic}</td><td class="c">${c.ok1} / ${c.n}</td><td class="c">${s.earned||0} / ${Q.pts}</td></tr>`;
+  });
+  const pTxt = PRED.find(p=>p.k===st.pred), real = predOf(l);
+  let pr = '';
+  if(pTxt){
+    const order = {half:0,tq:1,all:2};
+    const msg = st.pred===real ? "Bonne estimation, tu te connais bien ! 🔮" : order[st.pred]>order[real] ? "Tu étais un peu optimiste : relis les explications des montants manqués." : "Tu t'es sous-estimé(e) : tu en sais plus que tu ne le pensais !";
+    pr = `<div class="predres">Tu avais prédit <b>« ${pTxt.t.toLowerCase()} »</b> ; tu as trouvé <b>${a1}/${an}</b> réponses du premier coup. ${msg}</div>`;
+  }
+  const next = l < LEVELS.length-1;
+  return `<div class="card"><div class="grade"><div class="medal">${medalOf(r1)}</div>
+      <div class="gr">${gr.g} — ${gr.t}</div><div class="stars" style="font-size:1.4rem">${starsOf(pts/lv.maxPoints)}</div>
+      <p class="muted small">Mission ${l+1} — ${lv.title} · <b>${pts} / ${lv.maxPoints} XP</b></p></div>
+    <div class="legend"><span>✅ juste du 1er coup</span><span>🔄 corrigé au 2e essai</span><span>👁 réponse montrée</span></div>
+    <div class="stats"><div class="stat"><div class="v" style="color:var(--accent)">${a1}</div><div class="k">✅ du 1er coup</div></div>
+      <div class="stat"><div class="v" style="color:var(--orange)">${a2}</div><div class="k">🔄 au 2e essai</div></div>
+      <div class="stat"><div class="v" style="color:var(--error)">${ak}</div><div class="k">👁 montrées</div></div>
+      <div class="stat"><div class="v">${Math.round(r1*100)} %</div><div class="k">réussite au 1er essai</div></div></div>
+    <div class="scroll"><table class="bilan"><thead><tr><th>Exercice</th><th class="c">Résultat</th><th class="c">✅ 1er coup</th><th class="c">XP</th></tr></thead><tbody>${rows}</tbody></table></div>
+    ${pr}
+    <div class="btn-row" style="justify-content:space-between;margin-top:16px">
+      <button class="btn btn-ghost" onclick="setScreen('hub')">🗺️ Parcours</button>
+      ${next ? `<button class="btn btn-primary" onclick="openLevel(${l+1})">Mission suivante ➜</button>` : `<button class="btn btn-gold" onclick="setScreen('hub')">🏁 Voir mon bilan final ➜</button>`}</div></div>`;
+}
+function bilanIndicateurs(){
+  const acc = {};
+  const add = (id,max,got)=>{ const a = acc[id] || (acc[id]={pts:0,max:0}); a.max+=max; a.pts+=got; };
+  LEVELS.forEach((lv,l)=>lv.questions.forEach((Q,i)=>{
+    const st = APP.qs[key(l,i)] || {lock:{}}; const n = nEl(Q), w = Q.pts/n;
+    const keys = Q.type==='tab' ? Q.order : [...Array(n).keys()];
+    keys.forEach(k=>{
+      const ind = Q.type==='tab' ? (Q.inputs[k].ind||Q.ind) : Q.ind;
+      const lk = st.lock[k]; add(ind, w, lk==='ok1'?w:lk==='ok2'?w/2:0);
+    });
+  }));
+  const statut = r => r>=0.8 ? 'atteint' : r>=0.5 ? 'encours' : 'nonatteint';
+  return CRITERES.map(c=>{
+    const inds = c.indicateurs.map(ind=>{ const a=acc[ind.id]||{pts:0,max:0}; const r=a.max?a.pts/a.max:0; return Object.assign({},ind,{ratio:r,statut:statut(r)}); });
+    const tot = c.indicateurs.reduce((t,ind)=>{ const a=acc[ind.id]||{pts:0,max:0}; return {pts:t.pts+a.pts,max:t.max+a.max}; },{pts:0,max:0});
+    const r = tot.max ? tot.pts/tot.max : 0;
+    return { id:c.id, nom:c.nom, ratio:r, statut:statut(r), indicateurs:inds };
+  });
+}
+const ST_LBL = { atteint:'✅ Atteint', encours:"🟠 En cours d'acquisition", nonatteint:'❌ Non atteint' };
+function chapTxt(ind){ return ind.chapitres.map(c=>'« '+c+' »').join(' et '); }
+function globalFirst(){ let a=0,n=0; LEVELS.forEach((lv,l)=>lv.questions.forEach((Q,i)=>{ const c=elCounts(l,i); a+=c.ok1; n+=c.n; })); return n?a/n:0; }
+function renderFinal(){
+  const r1 = globalFirst(), gr = gradeOf(r1), rk = RANKS[rankIndex(APP.score)];
+  let rows = '';
+  LEVELS.forEach((lv,l)=>{ let a1=0,a2=0,ak=0; lv.questions.forEach((_,i)=>{ const c=elCounts(l,i); a1+=c.ok1; a2+=c.ok2; ak+=c.ko; });
+    const p=levelPts(l); rows += `<tr><td>${lv.icon} ${lv.title}</td><td class="c">${a1}</td><td class="c">${a2}</td><td class="c">${ak}</td><td class="c">${p} / ${lv.maxPoints}</td><td class="c stars">${starsOf(p/lv.maxPoints)}</td></tr>`; });
+  let crit = '', anyRev = false;
+  bilanIndicateurs().forEach(c=>{
+    crit += `<div class="crit"><div class="crit-h"><span>${c.id} — ${c.nom}</span><span class="st-badge st-${c.statut}">${ST_LBL[c.statut]}</span></div>`;
+    c.indicateurs.forEach(i=>{
+      crit += `<div class="ind"><span class="it">${i.texte}</span><span class="st-badge st-${i.statut}">${ST_LBL[i.statut]} · ${Math.round(i.ratio*100)} %</span>`;
+      if(i.statut!=='atteint'){ anyRev=true; crit += `<div class="revoir">📖 À revoir dans ton cours : <i>${chapTxt(i)}</i> — ${i.revoir}.</div>`; }
+      crit += `</div>`;
+    });
+    crit += `</div>`;
+  });
+  if(!anyRev) crit += `<div class="fb fb-ok"><h4>🎉 Tous les indicateurs sont atteints</h4><p>${APPCFG.bravo}</p></div>`;
+  return `<div class="card" style="border-color:rgba(255,209,102,.45)">
+    <div class="grade"><div class="medal">${medalOf(r1)}</div><h2>🏁 Bilan final</h2><div class="gr">${gr.g} — ${gr.t}</div>
+    <p class="muted small">${Math.round(r1*100)} % des réponses trouvées au 1er essai</p></div>
+    <div class="stats"><div class="stat"><div class="v">${APP.score}</div><div class="k">XP sur ${TOTAL_XP}</div></div>
+      <div class="stat"><div class="v">${rk.i}</div><div class="k">${rk.n}</div></div>
+      <div class="stat"><div class="v">🔥 ${APP.bestStreak}</div><div class="k">meilleure série</div></div>
+      <div class="stat"><div class="v">${APP.badges.size}/${BADGES.length}</div><div class="k">badges</div></div></div>
+    <div class="legend"><span>✅ juste du 1er coup</span><span>🔄 corrigé au 2e essai</span><span>👁 réponse montrée</span></div>
+    <div class="scroll"><table class="bilan"><thead><tr><th>Mission</th><th class="c">✅</th><th class="c">🔄</th><th class="c">👁</th><th class="c">XP</th><th class="c">★</th></tr></thead><tbody>${rows}</tbody></table></div>
+    <h3 style="margin-top:18px">🎯 Ce que tu maîtrises</h3>${crit}
+    <div class="btn-row" style="margin-top:16px;justify-content:center">
+      <button class="btn btn-ghost" onclick="printBilan()">🖨️ Imprimer mon bilan</button>
+      <button class="btn btn-sm btn-acc-outline" onclick="openLB('app')">🏆 Classement</button>
+      <button class="btn btn-sm btn-org-outline" onclick="openLB('global')">🌍 Général</button>
+      <button class="btn btn-gold" onclick="replay()">🔁 Rejouer</button></div></div>`;
+}
+function printBilan(){
+  let rows = '';
+  bilanIndicateurs().forEach(c=>c.indicateurs.forEach(i=>{
+    rows += `<tr><td>${c.id} — ${c.nom}</td><td>${i.texte}</td><td>${ST_LBL[i.statut].replace(/^[^ ]+ /,'')} (${Math.round(i.ratio*100)} %)</td><td>${i.statut==='atteint'?'—':chapTxt(i)+' : '+i.revoir}</td></tr>`;
+  }));
+  const r1 = globalFirst();
+  document.getElementById('printFiche').innerHTML = `<h1>${APPCFG.title} : mon bilan</h1>
+    <p>${esc(APP.email||'Élève')} ${APP.classe?'· '+esc(APP.classe):''} · ${new Date().toLocaleDateString('fr-BE')}</p>
+    <p>Score : <b>${APP.score} / ${TOTAL_XP} XP</b> · Réussite au 1er essai : <b>${Math.round(r1*100)} %</b> · Grade : <b>${gradeOf(r1).g}</b></p>
+    <h2>Critères et indicateurs</h2><table><thead><tr><th>Critère</th><th>Indicateur</th><th>Statut</th><th>À revoir dans mon cours</th></tr></thead><tbody>${rows}</tbody></table>
+    <p style="margin-top:12px;font-size:10px">Institut Saint-Luc Frameries — 6e Technicien en comptabilité — Fonction 5 : la rémunération (partie 2)</p>`;
+  window.print();
+}
+function resetState(){
+  APP.qs={}; APP.score=0; APP.streak=0; APP.bestStreak=0; APP.rankIdx=0;
+  APP.lv=LEVELS.map(()=>({done:false,pred:null,started:false}));
+  APP.badges=new Set(); APP.sent=new Set();
+  APP.exerciseTimes={}; APP.exerciseScores={}; APP.scoreBeforeExercise=0; APP.exerciseStartTime=null;
+  APP.level=0; APP.q=0;
+}
+function replay(){
+  if(!confirm("Rejouer tout le parcours ? Ton score et tes badges repartent de zéro (une nouvelle partie est créée dans le classement).")) return;
+  TRACKING.sessionId = new Date().toISOString(); resetState(); APP.globalTimerStart = Date.now(); setScreen('hub');
+}
+
+/* ============================================================
+   TRACKING — SPEC_Tracking_Eleves_v5 (JSONP pour tous les GET)
+   ============================================================ */
+function showEmailModal(){
+  const saved = localStorage.getItem('student_email') || '';
+  document.getElementById('modalHost').innerHTML = `<div class="modal" id="emailBox"><div class="modal-box" style="max-width:460px">
+    <div class="modal-h"><h3>🎓 Identification</h3></div>
+    <div class="modal-b"><p class="small muted" style="margin-bottom:12px">Entre ton adresse e-mail scolaire : tes résultats seront enregistrés et tu apparaîtras dans le classement de ta classe.</p>
+      <input class="field" id="emailInput" type="email" autocomplete="email" placeholder="prenom.nom@eleve.istlm.be" value="${esc(saved)}" onkeydown="if(event.key==='Enter')validateEmail()">
+      <div class="err-msg" id="emailError"></div></div>
+    <div class="modal-f"><button class="btn btn-primary" id="emailBtn" onclick="validateEmail()">✅ Vérifier et commencer</button></div></div></div>`;
+  setTimeout(()=>{ const i=document.getElementById('emailInput'); if(i) i.focus(); },200);
+}
+function validateEmail(){
+  const input=document.getElementById('emailInput'), btn=document.getElementById('emailBtn'), errDiv=document.getElementById('emailError');
+  const email=(input.value||'').trim().toLowerCase();
+  if(!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ errDiv.textContent='⚠️ Entre une adresse e-mail valide.'; return; }
+  btn.textContent='⏳ Vérification…'; btn.disabled=true; errDiv.textContent='';
+  const cbName='_emailCb_'+Date.now();
+  const offline = msg => { errDiv.innerHTML = msg+` <button class="btn btn-sm btn-ghost" onclick="offlineMode()">Continuer sans enregistrement</button>`; btn.textContent='✅ Vérifier et commencer'; btn.disabled=false; };
+  const timeout=setTimeout(()=>{ delete window[cbName]; const s=document.getElementById(cbName); if(s) s.remove(); offline('⚠️ Connexion impossible. Vérifie ta connexion internet.'); },10000);
+  window[cbName]=function(resp){
+    clearTimeout(timeout); delete window[cbName]; const s=document.getElementById(cbName); if(s) s.remove();
+    btn.textContent='✅ Vérifier et commencer'; btn.disabled=false;
+    if(resp && resp.found){
+      const oldEmail=localStorage.getItem('student_email');
+      localStorage.setItem('student_email',email); localStorage.setItem('student_classe',resp.classe||'');
+      APP.email=email; APP.classe=resp.classe||'';
+      if(oldEmail && oldEmail!==email) resetState();
+      TRACKING.sessionId=new Date().toISOString();
+      closeModal(); startGlobalTimer(); setScreen('welcome');
+    } else errDiv.textContent="⚠️ Cette adresse e-mail n'est pas enregistrée. Vérifie l'orthographe ou demande à ton professeur de t'ajouter à la liste.";
+  };
+  const s=document.createElement('script'); s.id=cbName;
+  s.src=`${TRACKING.scriptUrl}?action=check_email&email=${encodeURIComponent(email)}&callback=${cbName}`;
+  s.onerror=()=>{ clearTimeout(timeout); delete window[cbName]; s.remove(); offline('⚠️ Erreur de connexion au serveur.'); };
+  document.body.appendChild(s);
+}
+function offlineMode(){ APP.email=''; APP.classe=''; TRACKING.sessionId=new Date().toISOString(); closeModal(); startGlobalTimer(); setScreen('welcome'); }
+function startGlobalTimer(){
+  APP.globalTimerStart=Date.now(); const el=document.getElementById('globalTimer'); if(el) el.style.display='inline-flex';
+  if(APP.globalTimerInterval) clearInterval(APP.globalTimerInterval);
+  APP.globalTimerInterval=setInterval(updateTimerDisplay,1000); updateTimerDisplay();
+}
+function updateTimerDisplay(){
+  const el=document.getElementById('globalTimer'); if(!el || !APP.globalTimerStart) return;
+  const e=Math.floor((Date.now()-APP.globalTimerStart)/1000);
+  el.textContent='⏱️ '+String(Math.floor(e/60)).padStart(2,'0')+':'+String(e%60).padStart(2,'0');
+}
+function startExerciseTimer(idx){ APP.exerciseStartTime=Date.now(); APP.scoreBeforeExercise=APP.score||0; }
+function stopExerciseTimer(idx){
+  if(!APP.exerciseStartTime) return null;
+  const tempsSec=Math.round((Date.now()-APP.exerciseStartTime)/1000);
+  APP.exerciseTimes[idx]=tempsSec; APP.exerciseStartTime=null;
+  const deltaPoints=(APP.score||0)-APP.scoreBeforeExercise; APP.exerciseScores[idx]=deltaPoints;
+  return { points:deltaPoints, temps:tempsSec };
+}
+function sendResult(niveau, points, pointsMax, temps){
+  if(!APP.email) return;
+  const payload={ email:APP.email, classe:APP.classe, app:TRACKING.appName, niveau, points, pointsMax, temps, totalNiveaux:TRACKING.totalNiveaux, sessionId:TRACKING.sessionId };
+  try{ fetch(TRACKING.scriptUrl,{ method:"POST", mode:"no-cors", headers:{"Content-Type":"text/plain"}, body:JSON.stringify(payload) }).catch(err=>console.warn('[TRACKING] Erreur :',err)); }
+  catch(e){ console.warn('[TRACKING]',e); }
+}
+let currentLBTab='app';
+function openLB(tab){ document.getElementById('lbOverlay').style.display='block'; switchLBTab(tab||'app'); }
+function closeLB(){ document.getElementById('lbOverlay').style.display='none'; }
+function switchLBTab(tab){
+  currentLBTab=tab;
+  const a=document.getElementById('lbTabApp'), g=document.getElementById('lbTabGlobal');
+  a.style.cssText = tab==='app' ? 'background:var(--accent);color:#07130c;border:1px solid var(--accent)' : 'background:transparent;color:var(--accent);border:1px solid var(--accent)';
+  g.style.cssText = tab==='global' ? 'background:var(--orange);color:#2b1400;border:1px solid var(--orange)' : 'background:transparent;color:var(--orange);border:1px solid var(--orange)';
+  const cl = APP.classe ? ' ('+APP.classe+')' : '';
+  document.getElementById('lbTitle').textContent = tab==='app' ? '🏆 Classement — '+TRACKING.appName+cl : '🌍 Classement général'+cl;
+  fetchLeaderboard(tab);
+}
+function fetchLeaderboard(tab){
+  const content=document.getElementById('lbContent');
+  content.innerHTML='<div class="center muted" style="padding:40px">⏳ Chargement…</div>';
+  const action = tab==='app' ? 'leaderboard_app' : 'leaderboard_global';
+  const cbName='_lbCb_'+Date.now();
+  const timeout=setTimeout(()=>{ delete window[cbName]; const s=document.getElementById(cbName); if(s) s.remove();
+    content.innerHTML=`<div class="center" style="padding:40px"><div style="color:var(--error);margin-bottom:12px">⚠️ Connexion impossible</div><button class="btn btn-sm" onclick="fetchLeaderboard('${tab}')">Réessayer</button></div>`; },10000);
+  window[cbName]=function(resp){
+    clearTimeout(timeout); delete window[cbName]; const s=document.getElementById(cbName); if(s) s.remove();
+    const lbData = resp && (resp.leaderboard || resp.data);
+    if(!lbData || lbData.length===0){ content.innerHTML='<div class="center muted" style="padding:40px">🏁 Aucun résultat pour le moment</div>'; return; }
+    renderLeaderboard(lbData, tab);
+  };
+  let url=`${TRACKING.scriptUrl}?action=${action}&callback=${cbName}&mode=last`;
+  if(tab==='app') url+=`&app=${encodeURIComponent(TRACKING.appName)}`;
+  if(APP.classe) url+=`&classe=${encodeURIComponent(APP.classe)}`;
+  const s=document.createElement('script'); s.id=cbName; s.src=url;
+  s.onerror=()=>{ clearTimeout(timeout); delete window[cbName]; s.remove(); content.innerHTML='<div class="center" style="padding:40px;color:var(--error)">⚠️ Erreur de connexion</div>'; };
+  document.body.appendChild(s);
+}
+function renderLeaderboard(data, tab){
+  const content=document.getElementById('lbContent'), myEmail=(APP.email||'').toLowerCase();
+  if(tab==='global' && data.length>0){
+    data=data.slice().sort((a,b)=>{ const pa=(a.pct!=null?a.pct:(a.pourcentage||0)), pb=(b.pct!=null?b.pct:(b.pourcentage||0)); if(pb!==pa) return pb-pa; return (a.totalTemps||a.totalTime||0)-(b.totalTemps||b.totalTime||0); });
+    data.forEach((e,i)=>{ e.rang=i+1; });
+  }
+  const me=data.find(r=>(r.email||'').toLowerCase()===myEmail);
+  let html='';
+  if(me){
+    const pct=me.pct!=null?me.pct:(me.pourcentage||0);
+    const count = tab==='app' ? (me.niveauxCompletes||me.niveaux||0) : (me.appsCompletes||me.apps||0);
+    const total = tab==='app' ? (me.totalNiveaux||TRACKING.totalNiveaux||0) : (me.totalPossibleNiveaux||0);
+    html+=`<div style="background:rgba(58,224,140,.08);border:1px solid rgba(58,224,140,.3);border-radius:12px;padding:14px;margin-bottom:14px;display:flex;justify-content:space-around;text-align:center;flex-wrap:wrap;gap:8px">
+      <div><div style="font-size:1.3rem;font-weight:800;color:var(--accent)">#${me.rang}</div><div class="tiny muted">RANG</div></div>
+      <div><div style="font-size:1.3rem;font-weight:800">${me.totalPoints}</div><div class="tiny muted">POINTS</div></div>
+      <div><div style="font-size:1.3rem;font-weight:800;color:${pct>=80?'var(--accent)':pct>=50?'var(--orange)':'var(--error)'}">${pct}%</div><div class="tiny muted">RÉUSSITE</div></div>
+      <div><div style="font-size:1.3rem;font-weight:800;color:var(--text2)">${total>0?count+'/'+total:count} ${tab==='app'?'missions':'apps'}</div><div class="tiny muted">PROGRESSION</div></div></div>`;
+  }
+  const medals=['🥇','🥈','🥉'];
+  html+='<table class="bilan"><thead><tr><th>#</th><th>Élève</th><th class="c">Pts</th><th class="c">%</th><th class="c">Progression</th><th class="c">Temps</th></tr></thead><tbody>';
+  data.forEach(row=>{
+    const r=row.rang||0, em=(row.email||'');
+    const name=em.split('@')[0].split(/[._-]/).map(w=>w.charAt(0).toUpperCase()+w.slice(1)).join(' ');
+    const pct=row.pct!=null?row.pct:(row.pourcentage||0), temps=row.totalTemps||row.totalTime||0, isMe=em.toLowerCase()===myEmail;
+    const count = tab==='app' ? (row.niveauxCompletes||row.niveaux||0) : (row.appsCompletes||row.apps||0);
+    const total = tab==='app' ? (row.totalNiveaux||TRACKING.totalNiveaux||0) : (row.totalPossibleNiveaux||0);
+    const prog = total>0 ? Math.min(100,count/total*100) : 0;
+    let tStr='—'; if(temps>0){ const m=Math.floor(temps/60), s=temps%60; tStr = m>0 ? m+'m'+String(s).padStart(2,'0')+'s' : s+'s'; }
+    html+=`<tr style="${isMe?'background:rgba(58,224,140,.08)':''}"><td><b>${r<=3&&r>0?medals[r-1]:r}</b></td><td style="${isMe?'font-weight:800;color:var(--accent)':''}">${esc(name)}</td>
+      <td class="c" style="color:var(--accent);font-weight:700">${row.totalPoints}</td><td class="c">${pct}%</td>
+      <td class="c"><div style="height:6px;background:var(--bg3);border-radius:3px;overflow:hidden;min-width:60px"><i style="display:block;height:100%;width:${prog}%;background:linear-gradient(90deg,var(--accent),var(--orange))"></i></div><span class="tiny muted">${count}/${total}</span></td>
+      <td class="c tiny">${tStr}</td></tr>`;
+  });
+  content.innerHTML = html+'</tbody></table>';
+}
+
+/* ============================================================
+   DÉMARRAGE
+   ============================================================ */
+function init(){ APP.rankIdx = rankIndex(APP.score); setScreen('welcome'); showEmailModal(); }
+init();
+
+</script>
+</body>
+</html>
